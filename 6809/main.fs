@@ -20,3 +20,6 @@ s" meta.fs" included
 \ 6809 assembler
 s" assembler.fs" included
 
+
+\ test meta and assembler
+s" tests.fs" included

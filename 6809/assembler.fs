@@ -2,7 +2,7 @@
 \ 6809 assembler
 \    Filename:      assembler.fs
 \    Date:          08 oct. 2024
-\    Updated:       18 oct. 2024
+\    Updated:       20 oct. 2024
 \    File Version:  1.0
 \    MCU:           eFORTH windows
 \    Copyright:     Marc PETREMANN
@@ -11,8 +11,7 @@
 \ *********************************************************************
 
 
-
-
+\ definitions for general compatibility
 : ?error  ( fl n -- )
     swap if
         throw
@@ -257,7 +256,7 @@ Y constant IP       U constant SP       S constant RP       X constant W
         if  
             swap c, c,                  \ 8 bit
         else  
-            $10 c,  swap c, 2-  w,  
+            $10 c,  swap c, 2-  t-w,
         then 
         reset 
   ;
