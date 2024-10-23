@@ -23,3 +23,9 @@ s" assembler.fs" included
 
 \ test meta and assembler
 s" tests.fs" included
+
+
+\ test meta and assembler
+s" Z79FORTH.fs" included
+
+

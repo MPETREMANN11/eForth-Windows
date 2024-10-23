@@ -2,7 +2,7 @@
 \ 6809 assembler meta definitions
 \    Filename:      meta.fs
 \    Date:          18 oct. 2024
-\    Updated:       18 oct. 2024
+\    Updated:       23 oct. 2024
 \    File Version:  1.0
 \    MCU:           eFORTH windows
 \    Copyright:     Marc PETREMANN
@@ -10,17 +10,45 @@
 \    GNU General Public License
 \ *********************************************************************
 
-
+vocabulary assembler        \ vocabulary ASSEMBLER with assembl. isntruct.
 vocabulary target           \ vocabulary TARGET receive headers
 
-vocabulary meta
-meta definitions
+vocabulary meta             \ voc. META for meta-assembler/compiler
+
+: in-assembler  ( -- )
+    only forth also
+    meta also 
+    assembler definitions also
+  ;
+
+: in-target  ( -- )
+    only target definitions \ search order target >> forth
+  ;
+
+: in-meta  ( -- )
+    only forth also
+    meta definitions also   \ search order: meta >> forth
+  ;
+
+: in-forth  ( -- )
+    only forth also
+    forth definitions
+    meta also 
+    target also
+    assembler
+  ;
+
+
+in-meta
 
 0 value target-init?        \ flag at 0 if target is not initialized
 0 value target-address      \ initial TARGET address
 0 value target-size         \ size allocated for target
 0 value target-offset       \ relative 
 0 value dp-t                \ Dictionnary Pointer in Target
+
+\ if true, display assembled datas
+0 value target-echo
 
 \ initialize target
 : init-target  ( size taddr -- )
@@ -49,15 +77,30 @@ meta definitions
     then
   ;
 
+\ display byte in hex format
+: #HH.  ( c -- )
+    base @ >r
+    0 <# # # #> type
+    r> base !
+  ;    
+
 \ store byte in target
 : c!-t  ( c taddr -- )
     target-abort            \ abort if target not initialized
-    target-address dp-t +  target-offset -  c!
+    target-address dp-t +  target-offset -  
+    target-echo if
+        dup #HH.
+    then
+    c!
   ;
 
 : !-t  ( n taddr -- )        \ stocke un mot 16 bits dans la cible
     target-abort             \ abort if target not initialized
-    target-address dp-t +  target-offset -  !
+    target-address dp-t +  target-offset -  
+    target-echo if
+        dup $100 /mod #HH. #HH.
+    then
+    !
   ;
 
 
@@ -69,21 +112,36 @@ meta definitions
 \ allot n bytes in target
 : allot-t  ( n -- ) 
     target-abort            \ abort if target not initialized
-    dp-t +!
+    +to dp-t
 ;
+
+\ increment dp-t
+: dp-t++  ( -- )
+    1 +to dp-t
+  ;
 
 \ compile byte in target
 : c,-t  ( char -- )          
     target-abort            \ abort if target not initialized
-    here-t c!-t 1 allot-t
+    dp-t target-offset - c!
+    dp-t++
 ;
 
-\ compile 16 bits word in target
+\ compile two bytes in target
 : ,-t  ( n -- )
-    target-abort            \ abort if target not initialized
-    here-t !-t 2 allot-t
+    $100 /mod  c,-t  c,-t 
 ;
 
+\ ***  META instructions:  *****************************************************
+
+
+
+: label:  ( -- <name> | -- n )
+    dp-t
+    in-target 
+    constant
+    in-forth
+  ;
 
 
 
