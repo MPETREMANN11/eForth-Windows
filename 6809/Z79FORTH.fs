@@ -14,6 +14,7 @@
 s" Z79Fconstants.fs" included
 
 in-assembler
+-1 to target-echo
 
 \ ***  Z79Forth specifics meta instructions  ***********************************
 
@@ -27,7 +28,15 @@ in-assembler
 \ E7EF 3710             (        forth.asm):01395 (4+2)           pulu    x
 \ E7F1 1037C1           (        forth.asm):01396 (4)             cmpr    0,x             Update CC based on the outcome
 \ E7F4 39               (        forth.asm):01397 (4)             rts
+\ E7F5 C601             (        forth.asm):01398 (2)     @npop1  ldb     #1              Data stack underflow
+\ E7F7 BDE74C           (        forth.asm):01399 (7)             jsr     ERRHDLR         No return
+\      E7FA             (        forth.asm):01400         DPOPRA  equ     *
+\ E7FA 12               (        forth.asm):01401 (1)             nop
 
 label: NPOP
-\     NSTBOT # cmpu,
+        NSTBOT # cmpu,
+        bhs, IF,
+\             x pulu,
+        ENDIF,
+label: DPOPRA
 

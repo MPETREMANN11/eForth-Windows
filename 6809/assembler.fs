@@ -2,7 +2,7 @@
 \ 6809 assembler
 \    Filename:      assembler.fs
 \    Date:          08 oct. 2024
-\    Updated:       23 oct. 2024
+\    Updated:       24 oct. 2024
 \    File Version:  1.0
 \    MCU:           eFORTH windows
 \    Copyright:     Marc PETREMANN
@@ -16,6 +16,8 @@ forth definitions
 : ?error  ( fl n -- )
     swap if
         throw
+    else
+        drop
     then
   ;
 
@@ -53,11 +55,8 @@ assembler definitions
 \ store opcode with prefix (if any) in addr pointed by dp-t minus target-offset
 : opcode,
     dup $FF00 and
-    if
-        c,-t
-    else
-        ,-t
-    then
+    if  ,-t  exit  then
+    c,-t
   ;
 
 \ $00=immed, $10=direct, $20=indexed, $30=extended
@@ -132,15 +131,15 @@ Y constant IP       U constant SP       S constant RP       X constant W
         @ opcode, reset \ -- | lay one or two bytes
   ;
 
-$3A inhop ABX,      $48 inhop ASLA,     $58 inhop ASLB,     $47 inhop ASRA,
-$57 inhop ASRB,     $4F inhop CLRA,     $5F inhop CLRB,     $43 inhop COMA,
-$53 inhop COMB,     $19 inhop DAA,      $4A inhop DECA,     $5A inhop DECB,
-$4C inhop INCA,     $5C inhop INCB,     $48 inhop LSLA,     $58 inhop LSLB,
-$44 inhop LSRA,     $54 inhop LSRB,     $3D inhop MUL,      $40 inhop NEGA,
-$50 inhop NEGB,     $12 inhop NOP,      $49 inhop ROLA,     $59 inhop ROLB,
-$46 inhop RORA,     $56 inhop RORB,     $3B inhop RTI,      $39 inhop RTS,
-$1D inhop SEX,      $3F inhop SWI,    $103F inhop SWI2,   $113F inhop SWI3,
-$13 inhop SYNC,     $4D inhop TSTA,     $5D inhop TSTB,
+$3a inhop abx,      $48 inhop asla,     $58 inhop aslb,     $47 inhop asra,
+$57 inhop asrb,     $4f inhop clra,     $5f inhop clrb,     $43 inhop coma,
+$53 inhop comb,     $19 inhop daa,      $4a inhop deca,     $5a inhop decb,
+$4c inhop inca,     $5c inhop incb,     $48 inhop lsla,     $58 inhop lslb,
+$44 inhop lsra,     $54 inhop lsrb,     $3d inhop mul,      $40 inhop nega,
+$50 inhop negb,     $12 inhop nop,      $49 inhop rola,     $59 inhop rolb,
+$46 inhop rora,     $56 inhop rorb,     $3b inhop rti,      $39 inhop rts,
+$1d inhop sex,      $3f inhop swi,    $103f inhop swi2,   $113f inhop swi3,
+$13 inhop sync,     $4d inhop tsta,     $5d inhop tstb,
 
 
 \ ***  6809 assembler: immediate instructions  *********************************
@@ -156,7 +155,7 @@ $13 inhop SYNC,     $4D inhop TSTA,     $5D inhop TSTB,
 $3C immop CWAI,     $34 immop $PSHS,    $36 immop PSHU,     $35 immop PULS,
 $37 immop PULU,     $1C immop $ANDCC,   $1A immop ORCC,
 
-: RROP
+: rrop
     create          \ opcode -- | Register-Register
         (,)
     does>           \ srcrval dstrval --
@@ -195,20 +194,20 @@ $1E rrop EXG,    $1F rrop TFR,
 
 \ lay constant offset
 : cofset   ( operand postbyte -- )
-    over 0=  if  
+    over 0=  if
         $0f0 and 4 or c,-t drop     \ no offset
-    else 
+    else
         over 5bit? over notindir? and if
             $60 and swap $1f and or c,-t          \ 5 bit offset
-        else 
-            over 8bit? if  
+        else
+            over 8bit? if
                 $0fe and c,-t c,-t    \ 8 bit offset
-            else  
+            else
                 c,-t ,-t        \ 16 bit offset
-            then 
-        then 
-    then 
-  ;       
+            then
+        then
+    then
+  ;
 
 
 \ ***  6809 assembler: indexed, immed  *****************************************
@@ -232,9 +231,9 @@ $1E rrop EXG,    $1F rrop TFR,
 : immed  (  operand opcode-pfa -- | lay immediate poststuff )
     2+ @  dup 0= 3 ?error       \ test immedsize
     1- if                       \ lay immed. operand in reqd.size
-        w,
+        ,-t
     else
-        c,
+        c,-t
     then
   ;
 
@@ -292,7 +291,7 @@ $1E rrop EXG,    $1F rrop TFR,
 0 $108f genop sty,      1   $80 genop suba,     1   $c0 genop subb,
 2   $83 genop subd,     0   $4d genop tst,
 
-$32 inxop leas,     $33 inxop leau,  
+$32 inxop leas,     $33 inxop leau,
 $30 inxop leax,     $31 inxop leay,
 
 
@@ -321,11 +320,11 @@ $30 inxop leax,     $31 inxop leay,
 
 \ ***  6809 assembler: branch instructions  ************************************
 
-$24 condbr BCC,     $25 condbr BCS,     $27 condbr BEQ,     $2C condbr BGE,
-$2E condbr BGT,     $22 condbr BHI,     $24 condbr BHS,     $2F condbr BLE,
-$25 condbr BLO,     $23 condbr BLS,     $2D condbr BLT,     $2B condbr BMI,
-$26 condbr BNE,     $2A condbr BPL,     $21 condbr BRN,     $28 condbr BVC,
-$29 condbr BVS,   $2016 condbr BRA,   $8D17 condbr BSR,
+$24 condbr bcc,     $25 condbr bcs,     $27 condbr beq,     $2c condbr bge,
+$2e condbr bgt,     $22 condbr bhi,     $24 condbr bhs,     $2f condbr ble,
+$25 condbr blo,     $23 condbr bls,     $2d condbr blt,     $2b condbr bmi,
+$26 condbr bne,     $2a condbr bpl,     $21 condbr brn,     $28 condbr bvc,
+$29 condbr bvs,   $2016 condbr bra,   $8d17 condbr bsr,
 
 
 \ ***  6809 assembler: conditions  *********************************************
@@ -339,10 +338,18 @@ $29 constant VC     $20 constant NVR
 
 \ ***  6809 assembler: structured cond'ls  *************************************
 
-\ : IF,     \ br.opcode -- adr.next.instr 2  | reserve space
-\    C, 0 C, HERE 2 ;
-\ : ENDIF,  \ adr.instr.after.br 2 -- | patch the forward ref.
-\    2 ?PAIRS   HERE OVER -  DUP 8BIT? 0= 3 ?ERROR  SWAP 1- C! ;
+\ copile branching and reserve space
+: IF,  ( br.opcode -- adr.next.instr 2 )
+    c,-t  $00 c,-t
+    here-t  2
+  ;
+
+\ patch the forward ref.
+: ENDIF,  ( adr.instr.after.br 2 -- ) 
+   2 ?pairs   
+    here over -  dup 8bit? 0= 3 ?error  swap 1- c! 
+  ;
+
 \ : ELSE,   \ adr.after.br 2 -- adr.after.this.br 2
 \    2 ?PAIRS   NVR C, 0 C, HERE SWAP  2 ENDIF, 2 ;
 \ : BEGIN,  \ -- dest.adr 1

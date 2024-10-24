@@ -14,7 +14,7 @@
 s" assert.fs"       included
 
 only  forth definitions
-meta also assembler also
+in-forth
 
 1024 constant target-allocation
 
@@ -24,6 +24,7 @@ target-allocation target: Z79FORTH
 assert( Z79FORTH target-address = )
 assert( target-allocation target-size = )
 assert( dp-t 0 = )
+\ assert( dp-t  )
 
 
 

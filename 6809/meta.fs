@@ -2,7 +2,7 @@
 \ 6809 assembler meta definitions
 \    Filename:      meta.fs
 \    Date:          18 oct. 2024
-\    Updated:       23 oct. 2024
+\    Updated:       24 oct. 2024
 \    File Version:  1.0
 \    MCU:           eFORTH windows
 \    Copyright:     Marc PETREMANN
@@ -17,7 +17,7 @@ vocabulary meta             \ voc. META for meta-assembler/compiler
 
 : in-assembler  ( -- )
     only forth also
-    meta also 
+    meta also
     assembler definitions also
   ;
 
@@ -33,7 +33,7 @@ vocabulary meta             \ voc. META for meta-assembler/compiler
 : in-forth  ( -- )
     only forth also
     forth definitions
-    meta also 
+    meta also
     target also
     assembler
   ;
@@ -44,7 +44,7 @@ in-meta
 0 value target-init?        \ flag at 0 if target is not initialized
 0 value target-address      \ initial TARGET address
 0 value target-size         \ size allocated for target
-0 value target-offset       \ relative 
+0 value target-offset       \ relative
 0 value dp-t                \ Dictionnary Pointer in Target
 
 \ if true, display assembled datas
@@ -52,7 +52,7 @@ in-meta
 
 \ initialize target
 : init-target  ( size taddr -- )
-    to target-address          \ set real target address
+    to target-address       \ set real target address
     dup allot               \ allocate target size
     to target-size          \ set target-size
     -1 to target-init?      \ set target-initi? to true
@@ -66,8 +66,9 @@ in-meta
   ;
 
 \ set offset in target
-: offset!-t  ( n -- )
-    to target-offset
+: set-target-offset  ( n -- )
+    dup to target-offset
+    +to dp-t                \ inc. dp-t with target-offset
   ;
 
 \ abort if target is not initialized
@@ -78,39 +79,38 @@ in-meta
   ;
 
 \ display byte in hex format
-: #HH.  ( c -- )
-    base @ >r
-    0 <# # # #> type
-    r> base !
-  ;    
+: #HH.  ( n -- )
+    begin
+        $100 /mod >r
+        base @ >r  hex
+        <# # # #> type space
+        r> base !
+        r> ?dup 0=
+    until
+  ;
 
-\ store byte in target
-: c!-t  ( c taddr -- )
+\ transform dp-t in physical address
+: physical-address@ ( -- addr )
+    target-address dp-t +  target-offset -
+  ;
+
+\ store one byte in target
+: c!-t  ( c -- )
     target-abort            \ abort if target not initialized
-    target-address dp-t +  target-offset -  
+    physical-address@
     target-echo if
-        dup #HH.
+        over #HH.
     then
     c!
   ;
 
-: !-t  ( n taddr -- )        \ stocke un mot 16 bits dans la cible
-    target-abort             \ abort if target not initialized
-    target-address dp-t +  target-offset -  
-    target-echo if
-        dup $100 /mod #HH. #HH.
-    then
-    !
-  ;
-
-
 \ push target dictionnary pointer
-: here-t  ( -- taddr )     
+: here-t  ( -- taddr )
     dp-t target-offset +
 ;
 
 \ allot n bytes in target
-: allot-t  ( n -- ) 
+: allot-t  ( n -- )
     target-abort            \ abort if target not initialized
     +to dp-t
 ;
@@ -121,24 +121,21 @@ in-meta
   ;
 
 \ compile byte in target
-: c,-t  ( char -- )          
-    target-abort            \ abort if target not initialized
-    dp-t target-offset - c!
+: c,-t  ( char -- )
+    c!-t
     dp-t++
 ;
 
 \ compile two bytes in target
 : ,-t  ( n -- )
-    $100 /mod  c,-t  c,-t 
+    $100 /mod  c,-t  c,-t
 ;
 
 \ ***  META instructions:  *****************************************************
 
-
-
 : label:  ( -- <name> | -- n )
     dp-t
-    in-target 
+    in-target
     constant
     in-forth
   ;
