@@ -1,1 +1,1 @@
-
+<img src="fondEnTetePage.jpg"/>
