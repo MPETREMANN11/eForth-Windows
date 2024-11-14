@@ -10,14 +10,30 @@
 \    GNU General Public License
 \ *********************************************************************
 
-DEFINED? --grExt [if] forget --grExt  [then]
-create --grExt
+
+DEFINED? --graphics [if] forget --graphics  [then]
+create --graphics
+
+DEFINED? .( invert [IF]
+-1 value COMMENT_DISPLAY
+: .(   
+    [char] ) parse 
+    COMMENT_DISPLAY if
+        type cr 
+    else
+        2drop
+    then
+  ; immediate
+[THEN]
 
 \ load graphics extensions
-s" graphicsExtensions.fs" included
+include graphicsExtensions.fs
 
 \ load graphics tests
-s" config.fs" included
+include config.fs
 
 \ load graphics tests
-s" graphicsTests.fs" included
+include tests/graphicsTests.fs
+
+\ load 01_hello.fs test
+\ include tests/01_hello.fs

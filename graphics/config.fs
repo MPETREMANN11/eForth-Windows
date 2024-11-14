@@ -2,7 +2,7 @@
 \ Configuration for Graphics extensions tests
 \    Filename:      config.fs
 \    Date:          24 may 2023
-\    Updated:       24 may 2023
+\    Updated:       14 nov 2024
 \    File Version:  1.0
 \    MCU:           eFORTH windows
 \    Copyright:     Marc PETREMANN
@@ -15,7 +15,7 @@
 $000000 constant COLOR_BLACK
 $FFFFFF constant COLOR_WHITE
 $808080 constant COLOR_GRAY
-$D3D3D3 constant COLOR_LightGray
+$D3D3D3 constant COLOR_LIGHTGRAY
 
 $ff0000 constant COLOR_RED
 $FFC0CB constant COLOR_PINK

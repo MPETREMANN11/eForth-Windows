@@ -18,7 +18,7 @@ graphics internals definitions
 windows also
 
 \ MoveToEx updates the current position
-z" MoveToEx"      3 Gdi32 Gdi.MoveToEx ( hdc x y -- fl )
+z" MoveToEx"      4 Gdi32 Gdi.MoveToEx ( hdc x y LPPOINT -- fl )
 
 
 \ LineTo draws a line from the current position to,
@@ -47,8 +47,11 @@ graphics definitions internals
     0= if ." ERROR" then
   ;
 
+create LPPOINT
+    POINT allot
+
 : moveTo ( x y -- )
-    hdc -rot Gdi.MoveToEx gdiError
+    hdc -rot LPPOINT Gdi.MoveToEx gdiError
   ;
 
 : lineTo ( x y -- )
