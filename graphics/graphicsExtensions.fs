@@ -14,8 +14,11 @@
 \ online doc: https://learn.microsoft.com/fr-fr/windows/win32/api/_gdi/
 
 
+\ ***  Graphics primitives in graphics internals voc.  *************************
+
+only forth 
+windows also 
 graphics internals definitions
-windows also
 
 \ MoveToEx updates the current position
 z" MoveToEx"      4 Gdi32 Gdi.MoveToEx ( hdc x y LPPOINT -- fl )
@@ -40,8 +43,16 @@ z" GetPixel"    3 gdi32 Gdi.GetPixel ( hdc x y -- color )
 \ to the specified color.
 z" SetPixel"    4 gdi32 Gdi.SetPixel ( hdc x y colorref -- colorref )
 
+
+
+\ ***  Graphics words in graphics voc.  ****************************************
+
 only forth 
-graphics definitions internals
+windows also 
+graphics internals also
+graphics definitions
+
+
 
 : gdiError ( n -- )
     0= if ." ERROR" then
