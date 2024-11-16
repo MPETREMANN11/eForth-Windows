@@ -26,6 +26,12 @@ DEFINED? .( invert [IF]
   ; immediate
 [THEN]
 
+\ load windows extensions
+include dumpTool.fs
+
+\ load windows extensions
+include windowsExtensions.fs
+
 \ load graphics extensions
 include graphicsExtensions.fs
 
@@ -33,7 +39,7 @@ include graphicsExtensions.fs
 include config.fs
 
 \ load graphics tests
-include tests/graphicsTests.fs
+\ include tests/graphicsTests.fs
 
-\ load 01_hello.fs test
-\ include tests/01_hello.fs
+\ load 02_textOut.fs test
+include tests/02_textOut.fs

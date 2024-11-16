@@ -28,21 +28,25 @@ z" MoveToEx"      4 Gdi32 Gdi.MoveToEx ( hdc x y LPPOINT -- fl )
 \ but not including, the specified point.
 z" LineTo"      3 Gdi32 Gdi.LineTo ( hdc x y -- fl )
 
+\  @TODO: à tester rapidement
 z" Rectangle"   5 gdi32 Gdi.Rectangle   ( hdc left top right bottom -- )
 
+\  @TODO: à tester rapidement
 z" Ellipse"     5 gdi32 Gdi.Ellipse     \ hdc left top right bottom
 
-\ The CloseFigure function closes an open figure in a path.
+\ The CloseFigure function closes an open figure in a path.    @TODO: à tester rapidement
 z" CloseFigure" 1 gdi32 Gdi.CloseFigure ( hdc --  fl )
 
 \ The GetPixel function retrieves the red, green, blue (RGB) color value 
-\ of the pixel at the specified coordinates.
+\ of the pixel at the specified coordinates.   @TODO: à tester rapidement
 z" GetPixel"    3 gdi32 Gdi.GetPixel ( hdc x y -- color )
 
 \ The SetPixel function sets the pixel at the specified coordinates 
-\ to the specified color.
+\ to the specified color.    @TODO: à tester rapidement
 z" SetPixel"    4 gdi32 Gdi.SetPixel ( hdc x y colorref -- colorref )
 
+\ write text   
+z" TextOutA"            5 Gdi32 TextOutA
 
 
 \ ***  Graphics words in graphics voc.  ****************************************

@@ -2,8 +2,8 @@
 \ DUMP tool for eFORTH
 \    Filename:      dumpTool.fs
 \    Date:          12 jan 2022
-\    Updated:       27 feb 2023
-\    File Version:  1.0
+\    Updated:       16 nov 2024
+\    File Version:  1.1
 \    Forth:         eFORTH all versions 7.x++
 \    Copyright:     Marc PETREMANN
 \    Author:        Marc PETREMANN
@@ -18,8 +18,9 @@
 \ myBASE          \ current numeric base
           
 : dump ( start len -- )
-    cr cr ." --addr---  "
-    ." 00 01 02 03 04 05 06 07 08 09 0A 0B 0C 0D 0E 0F  ------chars-----"
+    cr cr 
+    229 bg  ." --addr---  "
+    ." 00 01 02 03 04 05 06 07 08 09 0A 0B 0C 0D 0E 0F  ------chars-----" 0 bg
     2dup + { END_ADDR }             \ store latest address to dump
     swap { START_ADDR }             \ store START address to dump
     START_ADDR 16 / 16 * { 0START_ADDR } \ calc. addr for loop start
