@@ -30,10 +30,10 @@ DEFINED? .( invert [IF]
 include dumpTool.fs
 
 \ load windows extensions
-include windowsExtensions.fs
+include User32-definitions.fs
 
 \ load graphics extensions
-include graphicsExtensions.fs
+include Gdi32-definitions.fs
 
 \ load graphics tests
 include config.fs
@@ -42,4 +42,14 @@ include config.fs
 \ include tests/graphicsTests.fs
 
 \ load 02_textOut.fs test
-include tests/02_textOut.fs
+\ include tests/02_textOut.fs
+
+\ load 04_drawText.fs test
+include tests/04_drawText.fs
+
+\ load 05_SetTextColor.fs test
+include tests/05_SetTextColor.fs
+
+
+
+
