@@ -1,8 +1,8 @@
 \ *********************************************************************
-\ API extensions for windows
-\    Filename:      windowsExtensions.fs
+\ User32 definitions for windows vocabulary
+\    Filename:      User32-definitions.fs
 \    Date:          16 nov 2024
-\    Updated:       16 nov 2023
+\    Updated:       18 nov 2024
 \    File Version:  1.0
 \    MCU:           eFORTH
 \    Copyright:     Marc PETREMANN
@@ -11,21 +11,12 @@
 \ *********************************************************************
 
 
-\ online doc: https://learn.microsoft.com/fr-fr/windows/win32/api/_gdi/
-
 
 only forth 
 windows definitions
 
-\ write text   @TODO: à tester rapidement
-z" DrawTextA"   5 User32 DrawTextA
-\ int DrawTextA(
-\   [in]      HDC    hdc,
-\   [in, out] LPCSTR lpchText,
-\   [in]      int    cchText,
-\   [in, out] LPRECT lprc,
-\   [in]      UINT   format
-\ );
+\ write text in RECT structure
+z" DrawTextA"   5 User32 DrawTextA  ( hdc lpchText cchText lprc format -- fl )
 
 \ DrawText format flags
 $00000000 constant DT_TOP
@@ -52,6 +43,15 @@ $00040000 constant DT_WORD_ELLIPSIS
 $00080000 constant DT_NOFULLWIDTHCHARBREAK
 $00100000 constant DT_HIDEPREFIX
 $00200000 constant DT_PREFIXONLY
+
+
+
+
+\           @TODO: à tester rapidement
+\ https://learn.microsoft.com/fr-fr/windows/win32/api/winuser/nf-winuser-sendmessagea 
+z" SendMessageA"     4 User32 SendMessageA  ( hWnd msg wParam iParam -- LRESULT )
+
+
 
 
 

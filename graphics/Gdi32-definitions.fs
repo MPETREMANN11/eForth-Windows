@@ -1,8 +1,8 @@
 \ *********************************************************************
-\ Graphics extensions for windows
-\    Filename:      graphicsExtensions.fs
+\ Graphics extensions for graphics vocabulary
+\    Filename:      Gdi32-definitions.fs
 \    Date:          09 mar 2023
-\    Updated:       10 mar 2023
+\    Updated:       18 nov 2024
 \    File Version:  1.0
 \    MCU:           eFORTH
 \    Copyright:     Marc PETREMANN
@@ -18,36 +18,33 @@
 
 only forth 
 windows also 
-graphics internals definitions
-
-\ MoveToEx updates the current position
-z" MoveToEx"      4 Gdi32 Gdi.MoveToEx ( hdc x y LPPOINT -- fl )
+graphics definitions
 
 
 \ LineTo draws a line from the current position to,
 \ but not including, the specified point.
-z" LineTo"      3 Gdi32 Gdi.LineTo ( hdc x y -- fl )
+z" LineTo"      3 Gdi32 LineTo ( hdc x y -- fl )
+
+\ MoveToEx updates the current position
+z" MoveToEx"    4 Gdi32 MoveToEx ( hdc x y LPPOINT -- fl )
 
 \  @TODO: à tester rapidement
-z" Rectangle"   5 gdi32 Gdi.Rectangle   ( hdc left top right bottom -- )
+z" Rectangle"   5 gdi32 Rectangle   ( hdc left top right bottom -- )
 
 \  @TODO: à tester rapidement
-z" Ellipse"     5 gdi32 Gdi.Ellipse     \ hdc left top right bottom
+z" Ellipse"     5 gdi32 Ellipse     \ hdc left top right bottom
 
 \ The CloseFigure function closes an open figure in a path.    @TODO: à tester rapidement
-z" CloseFigure" 1 gdi32 Gdi.CloseFigure ( hdc --  fl )
+z" CloseFigure" 1 gdi32 CloseFigure ( hdc --  fl )
 
 \ The GetPixel function retrieves the red, green, blue (RGB) color value 
 \ of the pixel at the specified coordinates.   @TODO: à tester rapidement
-z" GetPixel"    3 gdi32 Gdi.GetPixel ( hdc x y -- color )
+z" GetPixel"    3 gdi32 GetPixel ( hdc x y -- color )
 
 \ The SetPixel function sets the pixel at the specified coordinates 
 \ to the specified color.    @TODO: à tester rapidement
-z" SetPixel"    4 gdi32 Gdi.SetPixel ( hdc x y colorref -- colorref )
+z" SetPixel"    4 gdi32 SetPixel ( hdc x y colorref -- colorref )
 
-only forth 
-windows also 
-graphics definitions
 
 \ write text   
 z" TextOutA"    5 Gdi32 TextOutA
@@ -82,45 +79,42 @@ z" CreateFontA" 14 Gdi32 CreateFontA
 
 
 
-\ ***  Graphics words in graphics voc.  ****************************************
-
-only forth 
-windows also 
-graphics internals also
-graphics definitions
-
+\ ***  Alternate words in graphics voc.  ****************************************
 
 
 : gdiError ( n -- )
     0= if ." ERROR" then
   ;
 
-create LPPOINT
-    POINT allot
+\ create LPPOINT
+\     POINT allot
 
-: moveTo ( x y -- )
-    hdc -rot LPPOINT Gdi.MoveToEx gdiError
-  ;
 
-: lineTo ( x y -- )
-    hdc -rot Gdi.LineTo gdiError
-  ;
+\ Example of alternate versions 
 
-: rectangle ( left top right bottom -- )
-    >r >r >r >r hdc r> r> r> r> Gdi.Rectangle gdiError
-  ;
+\ : _moveTo ( x y -- )
+\     hdc -rot LPPOINT Gdi.MoveToEx gdiError
+\   ;
 
-: closeFigure ( -- )
-    hdc Gdi.CloseFigure gdiError
-  ;
+\ : _lineTo ( x y -- )
+\     hdc -rot Gdi.LineTo gdiError
+\   ;
 
-: getPixel ( x y -- colorref )
-    hdc -rot Gdi.GetPixel
-  ;
+\ : _rectangle ( left top right bottom -- )
+\     >r >r >r >r hdc r> r> r> r> Gdi.Rectangle gdiError
+\   ;
 
-: setPixel ( x y color -- )
-    hdc -rot Gdi.SetPixel
-  ;
+\ : _closeFigure ( -- )
+\     hdc Gdi.CloseFigure gdiError
+\   ;
+
+\ : _getPixel ( x y -- colorref )
+\     hdc -rot Gdi.GetPixel
+\   ;
+
+\ : _setPixel ( x y color -- )
+\     hdc -rot Gdi.SetPixel
+\   ;
 
 only forth definitions 
 
