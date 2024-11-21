@@ -37,20 +37,22 @@ z" CreatePen"       3 Gdi32 CreatePen ( iStyle cWidth color -- hPen )
 \         8 constant PS_ALTERNATE
 \ $0000000F constant PS_STYLE_MASK
 
-\ #define PS_ENDCAP_ROUND     0x00000000
-\ #define PS_ENDCAP_SQUARE    0x00000100
-\ #define PS_ENDCAP_FLAT      0x00000200
-\ #define PS_ENDCAP_MASK      0x00000F00
+\ $00000000 constant PS_ENDCAP_ROUND
+\ $00000100 constant PS_ENDCAP_SQUARE
+\ $00000200 constant PS_ENDCAP_FLAT
+\ $00000F00 constant PS_ENDCAP_MASK
 \
-\ #define PS_JOIN_ROUND       0x00000000
-\ #define PS_JOIN_BEVEL       0x00001000
-\ #define PS_JOIN_MITER       0x00002000
-\ #define PS_JOIN_MASK        0x0000F000
+\ $00000000 constant PS_JOIN_ROUND
+\ $00001000 constant PS_JOIN_BEVEL
+\ $00002000 constant PS_JOIN_MITER
+\ $0000F000 constant PS_JOIN_MASK
 \
-\ #define PS_COSMETIC         0x00000000
-\ #define PS_GEOMETRIC        0x00010000
-\ #define PS_TYPE_MASK        0x000F0000
+\ $00000000 constant PS_COSMETIC
+\ $00010000 constant PS_GEOMETRIC
+\ $000F0000 constant PS_TYPE_MASK
 
+\ creates a logical brush that has the specified solid color.
+z" CreateSolidBrush"  1 Gdi32 CreateSolidBrush ( color -- HBRUSH )
 
 \ LineTo draws a line from the current position to,
 \ but not including, the specified point.
@@ -59,7 +61,7 @@ z" LineTo"      3 Gdi32 LineTo ( hdc x y -- fl )
 \ MoveToEx updates the current position
 z" MoveToEx"    4 Gdi32 MoveToEx ( hdc x y LPPOINT -- fl )
 
-\  @TODO: à tester rapidement
+\ draw a rectangle
 z" Rectangle"   5 gdi32 Rectangle   ( hdc left top right bottom -- )
 
 \  @TODO: à tester rapidement
@@ -79,9 +81,6 @@ z" SelectObject"    2 Gdi32 SelectObject ( hdc h -- fl )
 \ to the specified color.    @TODO: à tester rapidement
 z" SetPixel"    4 gdi32 SetPixel ( hdc x y colorref -- colorref )
 
-
-\ write text
-z" TextOutA"    5 Gdi32 TextOutA  ( hdc x y lpString c -- fl )
 
 
 
@@ -116,14 +115,17 @@ z" GetCurrentObject" 2 Gdi32 GetCurrentObject
 \ link: https://learn.microsoft.com/fr-fr/windows/win32/api/wingdi/nf-wingdi-createfonta
 z" CreateFontA" 14 Gdi32 CreateFontA
 
+\ write text
+z" TextOutA"    5 Gdi32 TextOutA  ( hdc x y lpString c -- fl )
+
 
 
 \ ***  Alternate words in graphics voc.  ****************************************
 
 
-: gdiError ( n -- )
-    0= if ." ERROR" then
-  ;
+\ : gdiError ( n -- )
+\     0= if ." ERROR" then
+\   ;
 
 \ create LPPOINT
 \     POINT allot

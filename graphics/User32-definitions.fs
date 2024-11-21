@@ -56,5 +56,20 @@ z" SendMessageA"     4 User32 SendMessageA  ( hWnd msg wParam iParam -- LRESULT 
 
 
 \ sets the coordinates of the specified rectangle
-z" SetRect"     5 User32 SetRect
+z" SetRect"     5 User32 SetRect    ( LPRECT xLeft yTop xRight yBottom -- fl )
+
+\ get the coordinates of the specified rectangle
+: GetRect  ( LPRECT -- left top right bottom )
+    >r
+    r@ ->left   SL@
+    r@ ->top    SL@
+    r@ ->right  SL@
+    r@ ->bottom SL@
+    r> drop
+  ;
+
+
+
+z" UnionRect"     3 User32 UnionRect    ( lprcDst lprcSrc1 lprcSrc2 -- fl )
+
 

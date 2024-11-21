@@ -14,6 +14,18 @@
 DEFINED? --graphics [if] forget --graphics  [then]
 create --graphics
 
+DEFINED? L, invert [IF]
+\ compile 32 bits value in dictionnary
+: L,  ( u -- )
+    dup c,
+    8 rshift dup c,
+    8 rshift dup c,
+    8 rshift dup c,
+    drop
+  ;
+[THEN]
+
+
 DEFINED? .( invert [IF]
 -1 value COMMENT_DISPLAY
 : .(   
