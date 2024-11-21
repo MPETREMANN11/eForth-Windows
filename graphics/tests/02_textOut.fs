@@ -24,24 +24,33 @@ only
 windows also
 graphics internals
 
+ 
+z" ReleaseDC" 2 User32 ReleaseDC
+
+: String01 s" This is a first test string..."  ;
+: String02 s" This is a second test string..."  ;
 
 
-: lpString s" This is a test string..."  ;
+\ : TXTout  ( -- )
+\     WIN02 10 30 String02 TextOutA  drop
+\ ;
 
+: inWIN01
+    500 300 window 100 ms
+    hdc 10 10 String01 TextOutA  drop
+    hWnd hDc ReleaseDC drop
+  ;
 
-: TXTout  ( -- )
-    hdc 10 10 lpString TextOutA  drop
-    $ff0000 to color 
-    hdc 10 30 lpString TextOutA  drop
-    $000000 to color 
-;
+: inWIN02
+    500 300 window 100 ms
+    hdc 10 10 String02 TextOutA  drop
+    hwnd hdc ReleaseDC drop
+  ;
 
-
-
-
-: run
-    600 400 window 100 ms
-    TXTout
+: run02
+    inWIN01
+    key drop
+    inWIN02
     key drop
   ;
 

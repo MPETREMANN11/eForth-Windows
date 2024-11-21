@@ -1,7 +1,7 @@
 \ *********************************************************************
-\ drawText test
-\    Filename:      04_drawText.fs
-\    Date:          16 nov. 2024
+\ SetTextColor test
+\    Filename:      04_SetTextColor.fs
+\    Date:          17 nov. 2024
 \    Updated:       17 nov. 2024
 \    File Version:  1.0
 \    Forth:         eForth Windows
@@ -12,7 +12,7 @@
 
 
 
-.( 04_drawText.fs loaded - display text in window )
+.( 05_SetTextColor.fs loaded - change color text )
 
 
 
@@ -25,21 +25,6 @@ only
 windows also
 graphics internals
 
-\ struct RECT
-\   i32 field ->left
-\   i32 field ->top
-\   i32 field ->right
-\   i32 field ->bottom
-
-: RECT! { left top right bottom addr -- }
-    left   addr ->left   L!
-    top    addr ->top    L!
-    right  addr ->right  L!
-    bottom addr ->bottom L!
-  ;
-
-
-
 create LPRECT
     RECT allot
 
@@ -48,7 +33,7 @@ create LPRECT
 
 
 : DRAWtext  ( -- )
-    10 10 300 80 LPRECT RECT!
+    LPRECT 10 10 300 80 SetRect
     hdc lpchText1 LPRECT DT_TOP DT_WORDBREAK OR DT_CENTER OR DrawTextA drop
     hdc lpchText2 LPRECT DT_TOP DT_WORDBREAK OR DT_CENTER OR DrawTextA drop
   ;
@@ -61,18 +46,20 @@ create LPRECT
     DT_TOP          \ draw frop top
     DT_WORDBREAK OR \ break words
     DT_CENTER    OR \ center text
+
   ;
 
 : DRAWtext  ( -- )
-    10 10 200 120 LPRECT RECT!
-    $ff0000 to color
-    hdc STR01 LPRECT FORMATTING DrawTextA
+    LPRECT 10 10 200 120 SetRect drop
+    hdc $FF $00 $00 RGB SetTextColor drop
+    hdc STR01 LPRECT FORMATTING DrawTextA drop
   ;
 
 
 
-: run04
+: run05
     400 200 window 100 ms
+    $FF $00 $00 RGB to color
     DRAWtext
     key drop
   ;
