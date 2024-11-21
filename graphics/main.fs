@@ -45,11 +45,24 @@ include config.fs
 \ include tests/02_textOut.fs
 
 \ load 04_drawText.fs test
-include tests/04_drawText.fs
+\ include tests/04_drawText.fs
 
 \ load 05_SetTextColor.fs test
-include tests/05_SetTextColor.fs
+\ include tests/05_SetTextColor.fs
 
+\ load 06_DialogBox.fs test
+\ include tests/06_DialogBox.fs
 
+\ load 06_ListBox.fs test
+\ include tests/06_ListBox.fs
+
+\ load 08_CreateWindow.fs windows test
+\ include tests/08_CreateWindow.fs
+
+\ load 09_graphicsTests.fs line box, etc... test
+\ include tests/09_graphicsTests.fs
+
+\ load 10_shapesTests.fs rectangles, etc...
+include tests/10_shapesTests.fs
 
 
