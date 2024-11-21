@@ -31,14 +31,6 @@ graphics internals
 \   i32 field ->right
 \   i32 field ->bottom
 
-: RECT! { left top right bottom addr -- }
-    left   addr ->left   L!
-    top    addr ->top    L!
-    right  addr ->right  L!
-    bottom addr ->bottom L!
-  ;
-
-
 
 create LPRECT
     RECT allot
