@@ -2,7 +2,7 @@
 \ drawText test
 \    Filename:      04_drawText.fs
 \    Date:          16 nov. 2024
-\    Updated:       17 nov. 2024
+\    Updated:       21 nov. 2024
 \    File Version:  1.0
 \    Forth:         eForth Windows
 \    Copyright:     Marc PETREMANN
@@ -40,7 +40,7 @@ create LPRECT
 
 
 : DRAWtext  ( -- )
-    10 10 300 80 LPRECT RECT!
+    LPRECT 10 10 300 80 SetRect
     hdc lpchText1 LPRECT DT_TOP DT_WORDBREAK OR DT_CENTER OR DrawTextA drop
     hdc lpchText2 LPRECT DT_TOP DT_WORDBREAK OR DT_CENTER OR DrawTextA drop
   ;
@@ -56,7 +56,7 @@ create LPRECT
   ;
 
 : DRAWtext  ( -- )
-    10 10 200 120 LPRECT RECT!
+    LPRECT 10 10 200 120 SetRect
     $ff0000 to color
     hdc STR01 LPRECT FORMATTING DrawTextA
   ;
