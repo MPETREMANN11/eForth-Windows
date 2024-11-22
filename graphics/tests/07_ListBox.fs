@@ -1,8 +1,8 @@
 \ *********************************************************************
 \ ListBox test
-\    Filename:      06_ListBox.fs
+\    Filename:      07_ListBox.fs
 \    Date:          19 nov. 2024
-\    Updated:       19 nov. 2024
+\    Updated:       22 nov. 2024
 \    File Version:  1.0
 \    Forth:         eForth Windows
 \    Copyright:     Marc PETREMANN
@@ -10,9 +10,9 @@
 \    GNU General Public License
 \ *********************************************************************
 
+\ Infos: https://learn.microsoft.com/fr-fr/windows/win32/controls/create-a-simple-list-box 
 
-
-.( 06_ListBox.fs loaded - ListBox test )
+.( 07_ListBox.fs loaded - ListBox test )
 
 \ HWND hwndList = GetDlgItem(hDlg, ID_LB1);
 \ 
@@ -25,9 +25,11 @@
 windows
 
 \ Récupère un handle dans un contrôle dans la boîte de dialogue spécifiée
+\ @TODO: à tester
 z" GetDlgItem"  2 User32 GetDlgItem  ( hDlg nIDDlgItem -- 0|HWND )
 
 \ Récupère un handle dans un contrôle dans la boîte de dialogue spécifiée
+\ @TODO: à tester
 z" SendMessageA" 4 User32 SendMessageA  ( hWnd Msg wParam lParam -- LRESULT )
 
 $0180 constant LB_ADDSTRING
@@ -94,15 +96,79 @@ create LISTBOX
   ;
 
 
+\ ***  Listbox styles  ***
+$00000001 constant LBS_NOTIFY             
+$00000002 constant LBS_SORT               
+$00000004 constant LBS_NOREDRAW           
+$00000008 constant LBS_MULTIPLESEL        
+$00000010 constant LBS_OWNERDRAWFIXED     
+$00000020 constant LBS_OWNERDRAWVARIABLE  
+$00000040 constant LBS_HASSTRINGS         
+$00000080 constant LBS_USETABSTOPS        
+$00000100 constant LBS_NOINTEGRALHEIGHT   
+$00000200 constant LBS_MULTICOLUMN        
+$00000400 constant LBS_WANTKEYBOARDINPUT  
+$00000800 constant LBS_EXTENDEDSEL        
+$00001000 constant LBS_DISABLENOSCROLL    
+$00002000 constant LBS_NODATA             
+$00004000 constant LBS_NOSEL              
+$00008000 constant LBS_COMBOBOX           
+LBS_NOTIFY LBS_SORT or WS_VSCROLL or WS_BORDER or
+          constant LBS_STANDARD
 
-: run06
-    400 200 window 100 ms
-    $FF $00 $00 RGB to color
-    LISTtest
-    key drop
+
+$00000200 constant WS_EX_CLIENTEDGE
+: listTitle s" My ListBox" s>z ;
+: nullStr   s" " s>z ;
+
+
+0 value HW_LISTBOX
+
+\ : winListBox  ( -- )
+\     WS_EX_CLIENTEDGE
+\     listTitle
+\     nullStr
+\     WS_CHILD WS_VISIBLE or LBS_STANDARD or
+\     10 10 100 100
+\     hwnd
+\     NULL NULL NULL
+\     CreateWindowExA ?dup 0= if
+\ \         abort" ERROR: CreateWindowExA"
+\     else
+\         to HW_LISTBOX
+\     then
+\   ;
+
+: winListBox  ( -- )
+    0 GrfClass GrfWindowTitle WS_OVERLAPPEDWINDOW
+    CW_USEDEFAULT CW_USEDEFAULT width height
+    NULL NULL hinstance ['] GrfWindowProc callback
+    CreateWindowExA to HW_LISTBOX
+  ;
+
+: run07
+    WINDOW_WIDTH WINDOW_HEIGHT window
+    winListBox
+    begin
+        poll
+        IDLE event = if 
+             
+        then
+        event FINISHED = 
+    until
+
   ;
 
 
 
-
+\ Dans la DLL
+\ HWND CreateListBox(HWND hParent) {
+\     HWND hListBox = CreateWindowEx(WS_EX_CLIENTEDGE, "ListBox", "", 
+\                                    WS_CHILD | WS_VISIBLE | LBS_STANDARD, 
+\                                    10, 10, 100, 100, hParent, NULL, NULL, NULL);
+\     return hListBox;
+\ }
+\ 
+\ // Dans l'application principale
+\ HWND hListBox = CreateListBox(hWndMain); // hWndMain est le handle de la fenêtre principale
 

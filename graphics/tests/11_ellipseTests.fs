@@ -1,8 +1,8 @@
 \ *********************************************************************
-\ Drawing shapes tests for windows
-\    Filename:      10_shapesTests.fs
-\    Date:          20 nov 2024
-\    Updated:       20 nov 2024
+\ Drawing ellipses tests for windows
+\    Filename:      11_ellipseTests.fs
+\    Date:          21 nov 2024
+\    Updated:       21 nov 2024
 \    File Version:  1.0
 \    MCU:           eFORTH
 \    Copyright:     Marc PETREMANN
@@ -11,7 +11,7 @@
 \ *********************************************************************
 
 
-.( 10_shapesTests.fs loaded )
+.( 11_ellipseTests.fs loaded )
 
 windows also
 graphics
@@ -35,6 +35,9 @@ graphics internals
     r + + +
   ;
 
+
+\ Ellipses with transparent background
+
 0 value HPEN_RED
 0 value HPEN_BLUE
 
@@ -42,49 +45,6 @@ graphics internals
     PS_SOLID    1 $FF $00 $00 RGB CreatePen to HPEN_RED
     PS_SOLID    1 $00 $00 $FF RGB CreatePen to HPEN_BLUE
   ;
-
-
-
-create RECT01
-     10 L,  10 L, 220 L,  80 L,
-
-create RECT02
-     25 L,  25 L, 235 L,  95 L,
-
-: drawRects
-    setPens
-    setBrushes
-    hdc RECT01 GetRect Rectangle drop
-    hdc HPEN_RED    SelectObject drop
-    hdc HBRUSH_BLUE SelectObject drop
-    hdc RECT02 GetRect Rectangle drop
-  ;
-
-create POYGON01
-     30 L, 37 L,
-     44 L, 22 L,
-     58 L, 41 L,
-     43 L, 54 L,
-     56 L, 68 L,
-     43 L, 79 L,
-     31 L, 65 L,
-     20 L, 75 L,
-      5 L, 58 L,
-     19 L, 47 L,
-      6 L, 31 L,
-     19 L, 22 L,
-
-
-: drawPolygon
-    setPens
-    setBrushes
-    hdc HPEN_RED    SelectObject drop
-    hdc HBRUSH_BLUE SelectObject drop
-    hdc POYGON01 12 Polygon drop
-  ;
-
-
-\ Ellipses with transparent background
 
 
 0 value HBRUSH
@@ -97,8 +57,10 @@ create POYGON01
     $FF $00 $00 RGB CreateSolidBrush to HBRUSH_RED
     NULL_BRUSH GetStockObject ?dup if
         to HBRUSH
+        ." HBRUSH initialized" 
     else
-        GetLastError .
+        ." HBRUSH not initialized" 
+\         GetLastError .
         exit
     then
   ;
@@ -106,9 +68,8 @@ create POYGON01
 
 
 : drawEllipse ( -- )
-    setPens
+\     setPens
     setBrushes
-    NULL_BRUSH GetStockObject to HBRUSH
     hdc HBRUSH SelectObject drop
     hdc HPEN_RED    SelectObject drop
     hdc 10 10 400 200 Ellipse drop 
@@ -116,7 +77,7 @@ create POYGON01
     hdc 30 30 420 220 Ellipse drop 
   ;
 
-: run10
+: run11
     600 400 window
     drawEllipse
     begin
