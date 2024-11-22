@@ -2,7 +2,7 @@
 \ User32 definitions for windows vocabulary
 \    Filename:      User32-definitions.fs
 \    Date:          16 nov 2024
-\    Updated:       18 nov 2024
+\    Updated:       22 nov 2024
 \    File Version:  1.0
 \    MCU:           eFORTH
 \    Copyright:     Marc PETREMANN
@@ -14,6 +14,8 @@
 
 only forth 
 windows definitions
+
+
 
 \ write text in RECT structure
 z" DrawTextA"   5 User32 DrawTextA  ( hdc lpchText cchText lprc format -- fl )
@@ -49,14 +51,28 @@ $00200000 constant DT_PREFIXONLY
 
 \           @TODO: à tester rapidement
 \ https://learn.microsoft.com/fr-fr/windows/win32/api/winuser/nf-winuser-sendmessagea 
-z" SendMessageA"     4 User32 SendMessageA  ( hWnd msg wParam iParam -- LRESULT )
+z" SendMessageA"    4 User32 SendMessageA  ( hWnd msg wParam iParam -- LRESULT )
 
 
 
+
+\ sets the coordinates of the specified POINT structure
+: SetPoint  ( LPPOINT x y -- fl )
+    rot >r
+    r@ ->y   L!
+    r> ->x   L!
+  ;
+
+\ gets the coordinates from the specified POINT structure
+: GetPoint  ( LPPOINT -- x y )
+    >r
+    r@ ->x   SL@
+    r> ->y   SL@
+  ;
 
 
 \ sets the coordinates of the specified rectangle
-z" SetRect"     5 User32 SetRect    ( LPRECT xLeft yTop xRight yBottom -- fl )
+z" SetRect"         5 User32 SetRect    ( LPRECT xLeft yTop xRight yBottom -- fl )
 
 \ get the coordinates of the specified rectangle
 : GetRect  ( LPRECT -- left top right bottom )
@@ -64,12 +80,10 @@ z" SetRect"     5 User32 SetRect    ( LPRECT xLeft yTop xRight yBottom -- fl )
     r@ ->left   SL@
     r@ ->top    SL@
     r@ ->right  SL@
-    r@ ->bottom SL@
-    r> drop
+    r> ->bottom SL@
   ;
 
-
-
+\ @TODO: à tester rapidement
 z" UnionRect"     3 User32 UnionRect    ( lprcDst lprcSrc1 lprcSrc2 -- fl )
 
 

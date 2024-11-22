@@ -30,6 +30,6 @@ $A52A2A constant COLOR_BROWN
 
 \ define window dimension
 600 constant WINDOW_WIDTH
-300 constant WINDOW_HEIGHT
+400 constant WINDOW_HEIGHT
 
 

@@ -2,7 +2,7 @@
 \ Graphics extensions main file
 \    Filename:      main.fs
 \    Date:          09 mar 2023
-\    Updated:       24 may 2023
+\    Updated:       22 nov 2024
 \    File Version:  1.0
 \    MCU:           eFORTH
 \    Copyright:     Marc PETREMANN
@@ -68,6 +68,9 @@ include config.fs
 \ load 06_ListBox.fs test
 \ include tests/06_ListBox.fs
 
+\ load 07_ListBox.fs test
+include tests/07_ListBox.fs
+
 \ load 08_CreateWindow.fs windows test
 \ include tests/08_CreateWindow.fs
 
@@ -75,6 +78,13 @@ include config.fs
 \ include tests/09_graphicsTests.fs
 
 \ load 10_shapesTests.fs rectangles, etc...
-include tests/10_shapesTests.fs
+\ include tests/10_shapesTests.fs
 
+\ load 11_ellipseTests.fs 
+\ include tests/11_ellipseTests.fs
 
+\ load 12_arcsTests.fs 
+\ include tests/12_arcsTests.fs
+
+\ load 13_mappingTests.fs 
+\ include tests/13_mappingTests.fs 

@@ -2,7 +2,7 @@
 \ Graphics extensions for graphics vocabulary
 \    Filename:      Gdi32-definitions.fs
 \    Date:          09 mar 2023
-\    Updated:       18 nov 2024
+\    Updated:       22 nov 2024
 \    File Version:  1.0
 \    MCU:           eFORTH
 \    Copyright:     Marc PETREMANN
@@ -17,13 +17,27 @@
 \ ***  Graphics primitives in graphics internals voc.  *************************
 
 only forth
-windows also
+windows also structures also
 graphics definitions
 
 \ Creates a logical pen that has the specified style, width, and color
 z" CreatePen"       3 Gdi32 CreatePen ( iStyle cWidth color -- hPen )
 
-\ ***  Pen Styles  **********************************
+\ ***  Palette structures and constants  ***************************************
+
+struct PALETTEENTRY
+   i8 field ->peRed
+   i8 field ->peGreen
+   i8 field ->peBlue
+   i8 field ->peFlags
+
+struct LOGPALETTE
+  i32 field ->palVersion
+  i32 field ->palNumEntries
+  PALETTEENTRY field ->palPalEntry
+
+
+\ ***  Pen Styles constants  ***************************************************
 0 constant PS_SOLID
 1 constant PS_DASH
 2 constant PS_DOT
@@ -51,8 +65,26 @@ z" CreatePen"       3 Gdi32 CreatePen ( iStyle cWidth color -- hPen )
 \ $00010000 constant PS_GEOMETRIC
 \ $000F0000 constant PS_TYPE_MASK
 
+
+\ ***  Brushes  ***
+
 \ creates a logical brush that has the specified solid color.
 z" CreateSolidBrush"  1 Gdi32 CreateSolidBrush ( color -- HBRUSH )
+
+
+\ ***  Font and text  ***
+
+\ Set text color
+z" SetTextColor" 2 Gdi32 SetTextColor  ( hdc color -- fl )
+
+\ write text
+z" TextOutA"    5 Gdi32 TextOutA  ( hdc x y lpString c -- fl )
+
+
+\ ***  Lines and Curves  ***
+
+\ Draw arc
+z" Arc"     9 gdi32 Arc     ( hdc x1 y1 x2 y2 x3 y3 x4 y4 -- fl )
 
 \ LineTo draws a line from the current position to,
 \ but not including, the specified point.
@@ -61,11 +93,27 @@ z" LineTo"      3 Gdi32 LineTo ( hdc x y -- fl )
 \ MoveToEx updates the current position
 z" MoveToEx"    4 Gdi32 MoveToEx ( hdc x y LPPOINT -- fl )
 
+
+\ **  Filled Shapes  **
+
+\ Draw ellipse
+z" Ellipse"     5 gdi32 Ellipse     ( hdc left top right bottom -- fl )
+
+\ draw a polygone
+z" Polygon"   3 Gdi32 Polygon ( hdc *apt cpt -- fl )
+
 \ draw a rectangle
 z" Rectangle"   5 gdi32 Rectangle   ( hdc left top right bottom -- )
 
-\  @TODO: à tester rapidement
-z" Ellipse"     5 gdi32 Ellipse     \ hdc left top right bottom
+
+\ **  Maping and coordinates  **
+
+\ Specifies which window point maps to the viewport origin (0,0)
+z" SetViewportOrgEx"  4 Gdi32 SetViewportOrgEx  ( hdc x y lppt -- fl )
+
+
+
+
 
 \ The CloseFigure function closes an open figure in a path.    @TODO: à tester rapidement
 z" CloseFigure" 1 gdi32 CloseFigure ( hdc --  fl )
@@ -82,13 +130,11 @@ z" SelectObject"    2 Gdi32 SelectObject ( hdc h -- fl )
 z" SetPixel"    4 gdi32 SetPixel ( hdc x y colorref -- colorref )
 
 
-
-
 \ Set background color
 z" SetBkColor"  2 Gdi32 SetBkColor  ( hdc color -- fl )
 
-\ Set text color
-z" SetTextColor" 2 Gdi32 SetTextColor  ( hdc color -- fl )
+
+
 
 
 
@@ -115,47 +161,9 @@ z" GetCurrentObject" 2 Gdi32 GetCurrentObject
 \ link: https://learn.microsoft.com/fr-fr/windows/win32/api/wingdi/nf-wingdi-createfonta
 z" CreateFontA" 14 Gdi32 CreateFontA
 
-\ write text
-z" TextOutA"    5 Gdi32 TextOutA  ( hdc x y lpString c -- fl )
 
 
 
-\ ***  Alternate words in graphics voc.  ****************************************
-
-
-\ : gdiError ( n -- )
-\     0= if ." ERROR" then
-\   ;
-
-\ create LPPOINT
-\     POINT allot
-
-
-\ Example of alternate versions
-
-\ : _moveTo ( x y -- )
-\     hdc -rot LPPOINT Gdi.MoveToEx gdiError
-\   ;
-
-\ : _lineTo ( x y -- )
-\     hdc -rot Gdi.LineTo gdiError
-\   ;
-
-\ : _rectangle ( left top right bottom -- )
-\     >r >r >r >r hdc r> r> r> r> Gdi.Rectangle gdiError
-\   ;
-
-\ : _closeFigure ( -- )
-\     hdc Gdi.CloseFigure gdiError
-\   ;
-
-\ : _getPixel ( x y -- colorref )
-\     hdc -rot Gdi.GetPixel
-\   ;
-
-\ : _setPixel ( x y color -- )
-\     hdc -rot Gdi.SetPixel
-\   ;
 
 only forth definitions
 
