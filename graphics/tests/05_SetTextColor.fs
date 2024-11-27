@@ -59,12 +59,7 @@ create LPRECT
 
 : run05
     400 200 window 100 ms
-    $FF $00 $00 RGB to color
     DRAWtext
     key drop
   ;
-
-
-
-
 
