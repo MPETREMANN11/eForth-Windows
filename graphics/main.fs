@@ -69,7 +69,7 @@ include config.fs
 \ include tests/06_ListBox.fs
 
 \ load 07_ListBox.fs test
-include tests/07_ListBox.fs
+\ include tests/07_ListBox.fs
 
 \ load 08_CreateWindow.fs windows test
 \ include tests/08_CreateWindow.fs
@@ -88,3 +88,29 @@ include tests/07_ListBox.fs
 
 \ load 13_mappingTests.fs 
 \ include tests/13_mappingTests.fs 
+
+\ load 14_fontTests.fs
+\ include tests/14_fontTests.fs
+
+\ load 15_imageTest.fs
+\ include tests/15_imageTest.fs
+
+\ load 16_rectangleTest.fs
+\ include tests/16_rectangleTest.fs
+
+\ load 17_messageTests.fs
+\ include tests/17_messageTests.fs
+
+
+
+
+\ 100_hwndHdcTests.fs
+\ include tests/100_hwndHdcTests.fs
+
+\ 101_rectanglesTests.fs
+include tests/101_rectanglesTests.fs
+
+\ 102_menusTests.fs
+\ include tests/102_menusTests.fs
+
+

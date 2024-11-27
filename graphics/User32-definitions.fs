@@ -15,6 +15,12 @@
 only forth 
 windows definitions
 
+\ get handle for current window
+z" GetForegroundWindow"  0 User32 GetForegroundWindow   ( -- hwnd )
+
+\ Minimizes (but does not destroy) the specified window
+z" CloseWindow"  1 User32 CloseWindow   ( hwnd -- fl )
+
 
 
 \ write text in RECT structure
@@ -45,8 +51,6 @@ $00040000 constant DT_WORD_ELLIPSIS
 $00080000 constant DT_NOFULLWIDTHCHARBREAK
 $00100000 constant DT_HIDEPREFIX
 $00200000 constant DT_PREFIXONLY
-
-
 
 
 \           @TODO: à tester rapidement
@@ -83,7 +87,50 @@ z" SetRect"         5 User32 SetRect    ( LPRECT xLeft yTop xRight yBottom -- fl
     r> ->bottom SL@
   ;
 
+\ move RECT structure
+z" OffsetRect"  3 User32 OffsetRect   ( lprc dx dy -- fl )
+
 \ @TODO: à tester rapidement
 z" UnionRect"     3 User32 UnionRect    ( lprcDst lprcSrc1 lprcSrc2 -- fl )
+
+\ Create a menu
+z" CreateMenu"  0 User32 CreateMenu   ( -- hmenu|0 )
+
+\ Assigns a new menu to the specified window
+z" SetMenu"  2 User32 SetMenu   ( hwnd hmenu -- fl )
+
+\ Adds a new item to the end of the specified menu bar, drop-down menu, submenu, or context menu
+z" AppendMenuA"  4 User32 AppendMenuA   ( hmenu uFlags uIDNewItem lpNewItem -- fl )
+
+\ **  Menu flags  **
+$00000000 constant MF_INSERT
+$00000080 constant MF_CHANGE
+$00000100 constant MF_APPEND
+$00000200 constant MF_DELETE
+$00001000 constant MF_REMOVE
+$00000080 constant MF_END
+
+$00000000 constant MF_ENABLED
+$00000001 constant MF_GRAYED
+$00000002 constant MF_DISABLED
+$00000000 constant MF_STRING
+$00000004 constant MF_BITMAP
+$00000000 constant MF_UNCHECKED
+$00000008 constant MF_CHECKED
+$00000010 constant MF_POPUP
+$00000020 constant MF_MENUBARBREAK
+$00000040 constant MF_MENUBREAK
+$00000000 constant MF_UNHILITE
+$00000080 constant MF_HILITE
+$00000100 constant MF_OWNERDRAW
+$00000200 constant MF_USECHECKBITMAPS
+$00000000 constant MF_BYCOMMAND
+$00000400 constant MF_BYPOSITION
+$00000800 constant MF_SEPARATOR
+$00001000 constant MF_DEFAULT
+$00002000 constant MF_SYSMENU
+$00004000 constant MF_HELP
+$00004000 constant MF_RIGHTJUSTIFY
+$00008000 constant MF_MOUSESELECT
 
 
