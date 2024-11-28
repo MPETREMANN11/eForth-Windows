@@ -1,4 +1,4 @@
-<img src="couvertureLivre_FR.jpg"/>
+<img src="xxx"/>
 <h2>Sommaire</h2>
 Introduction<br/>
 Aide à la traduction<br/>
