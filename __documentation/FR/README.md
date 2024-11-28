@@ -1,155 +1,155 @@
 <img src="couvertureLivre_FR.jpg"/>
 <h2>Sommaire</h2>
-Introduction........................................................................................................6
-Aide à la traduction...................................................................................................6
-Pourquoi programmer en langage FORTH sur eForth Windows?.........................7
-Préambule................................................................................................................7
-Limites entre langage et application...........................................................................7
-C'est quoi un mot FORTH?.........................................................................................8
-Un mot c'est une fonction?........................................................................................8
-Le langage FORTH comparé au langage C..................................................................9
-Ce que FORTH permet de faire par rapport au langage C.......................................10
-Mais pourquoi une pile plutôt que des variables?...................................................11
-Êtes-vous convaincus?.........................................................................................11
-Existe-t-il des applications professionnelles écrites en FORTH?...................................12
-Installation sous Windows................................................................................14
-Paramétrer eForth Windows.................................................................................14
-Un vrai Forth 64 bits avec eForth Windows.......................................................17
-Les valeurs sur la pile de données............................................................................17
-Les valeurs en mémoire.......................................................................................17
-Traitement par mots selon taille ou type des données...........................................18
-Conclusion..............................................................................................................19
-Edition et gestion des fichiers sources pour eForth Windows...........................21
-Les éditeurs de fichiers texte....................................................................................21
-Utiliser un IDE.....................................................................................................22
-Stockage sur GitHub............................................................................................24
-Quelques bonnes pratiques......................................................................................24
-Le fichier main.fs.................................................................................................25
-Exemple d’organisation d’un projet...........................................................................26
-Commentaires et mise au point.........................................................................28
-Ecrire un code FORTH lisible....................................................................................28
-Indentation du code source.................................................................................29
-Les commentaires...................................................................................................30
-Les commentaires de pile....................................................................................30
-Signification des paramètres de pile en commentaires...........................................31
-Commentaires des mots de définition de mots......................................................32
-Les commentaires textuels.......................................................................................32
-Commentaire en début de code source.................................................................33
-Outils de diagnostic et mise au point........................................................................33
-Le décompilateur.................................................................................................34
-Dump mémoire...................................................................................................34
-Moniteur de pile..................................................................................................34
-Dictionnaire / Pile / Variables / Constantes......................................................37
-Étendre le dictionnaire.............................................................................................37
-Gestion du dictionnaire........................................................................................37
-Piles et notation polonaise inversée..........................................................................38
-Manipulation de la pile de paramètres..................................................................39
-La pile de retour et ses utilisations...........................................................................39
-Utilisation de la mémoire.........................................................................................40
-Variables.............................................................................................................40
-Constantes..........................................................................................................41
-Valeurs pseudo-constantes..................................................................................41
-Outils de base pour l'allocation de mémoire..........................................................41
-Les variables locales avec eForth Windows.......................................................43
-Introduction............................................................................................................43
-Le faux commentaire de pile....................................................................................43
-Action sur les variables locales.................................................................................44
-Structures de données pour eForth Windows....................................................48
-Préambule..............................................................................................................48
-Les tableaux en FORTH...........................................................................................48
-Tableau de données à une dimension...................................................................48
-Mots de définition de tableaux.............................................................................49
-Lire et écrire dans un tableau...............................................................................49
-Exemple pratique de gestion d'écran....................................................................50
-Gestion de structures complexes..............................................................................52
-Règles de nommage des structures et accesseurs.................................................54
-Choix de la taille des champs dans une structure...................................................55
-Définition de sprites................................................................................................57
-Les nombres réels avec eForth Windows...........................................................60
-Les réels avec eForth Windows................................................................................60
-Precision des nombres réels avec eForth Windows................................................60
-Constantes et variables réelles.............................................................................61
-Opérateurs arithmétiques sur les réels..................................................................61
-Opérateurs mathématiques sur les réels...............................................................62
-Opérateurs logiques sur les réels..........................................................................62
-Transformations entiers ↔ réels...........................................................................63
-Affichage des nombres et chaînes de caractères...............................................64
-Changement de base numérique..............................................................................64
-Définition de nouveaux formats d'affichage...............................................................65
-Affichage des caractères et chaînes de caractères.....................................................67
-Variables chaînes de caractères................................................................................69
-Code des mots de gestion de variables texte.........................................................70
-Ajout de caractère à une variable alphanumérique................................................72
-Comparaisons et branchements........................................................................74
-Branchements conditionnels vers l'avant...................................................................75
-Branchement conditionnel vers l'arrière....................................................................77
-Branchement en avant depuis une boucle indéfinie...................................................77
-Répétition contrôlée d'une action.............................................................................78
-Structure uni-conditionnelle à choix multiples............................................................79
-La récursivité..........................................................................................................80
-Les tests logiques....................................................................................................81
-Les vocabulaires avec eForth Windows.............................................................82
-Liste des vocabulaires..............................................................................................82
-Les vocabulaires essentiels..................................................................................82
-Liste du contenu d'un vocabulaire............................................................................83
-Utilisation des mots d'un vocabulaire........................................................................83
-Chainage des vocabulaires.......................................................................................83
-Les mots à action différée.................................................................................85
-Définition et utilisation de mots avec defer................................................................86
-Définition d'une référence avant...........................................................................86
-Un cas pratique.......................................................................................................87
-Les mots de création de mots............................................................................90
-Utilisation de does>................................................................................................90
-Exemple de gestion de couleur.............................................................................92
-Affichage de boites modales..............................................................................93
-MessageBoxA..........................................................................................................93
-Contenu et comportement de la boîte de dialogue.....................................................94
-Valeur retournée.................................................................................................95
-Explications supplémentaires................................................................................96
-Définition du bouton par défaut............................................................................97
-Rajout d'une icône dans la boite modale...............................................................98
-Etendre le vocabulaire graphics pour Windows...............................................100
-Définition des mots dans graphics internals.............................................................101
-Trouver les fonctions disponibles dans un fichier dll.................................................102
-Dependency Walker...........................................................................................103
-Premiers tracés graphiques.............................................................................105
-Ouvrir une fenêtre.................................................................................................105
-Tracé de lignes......................................................................................................106
-Coloration des tracés graphiques............................................................................107
-Tracé de formes géométriques........................................................................110
-Colorier l'intérieur des formes.................................................................................110
-Tracé de rectangles...............................................................................................110
-Tracé de polygones...............................................................................................112
-Tracé d'ellipses......................................................................................................113
-Tracé d'arcs..........................................................................................................114
-Afficher du texte dans l'environnement graphique.........................................116
-DrawTextA............................................................................................................116
-Définition de la zone de tracé du texte................................................................117
-Formatage du texte...........................................................................................118
-Changer la couleur du texte...................................................................................120
-TextOutA..............................................................................................................121
-Les fontes de caractères..................................................................................123
-Fonte et police......................................................................................................123
-CreateFontA..........................................................................................................123
-Contenu détaillé des vocabulaires eForth Windows........................................128
-Version v 7.0.7.21............................................................................................128
-FORTH..................................................................................................................128
-windows...............................................................................................................130
-Liste des fonctions graphiques de la librairie Gdi32........................................133
-Bitmaps................................................................................................................133
-Clip.......................................................................................................................134
-Coordonnées et transformation..............................................................................135
-Couleurs...............................................................................................................136
-Pinceaux...............................................................................................................136
-Stylos...................................................................................................................137
-Lignes et courbes..................................................................................................137
-Formes remplies....................................................................................................137
-Fontes et textes....................................................................................................138
-Contexte appareil..................................................................................................140
-Régions................................................................................................................141
-Ressources......................................................................................................142
-En anglais.............................................................................................................142
-En français............................................................................................................142
-GitHub..................................................................................................................142
-Facebook..............................................................................................................143 
+Introduction<br/>
+Aide à la traduction<br/>
+Pourquoi programmer en langage FORTH sur eForth Windows?<br/>
+Préambule<br/>
+Limites entre langage et application<br/>
+C'est quoi un mot FORTH?<br/>
+Un mot c'est une fonction?<br/>
+Le langage FORTH comparé au langage C<br/>
+Ce que FORTH permet de faire par rapport au langage C<br/>
+Mais pourquoi une pile plutôt que des variables?<br/>
+Êtes-vous convaincus?<br/>
+Existe-t-il des applications professionnelles écrites en FORTH?<br/>
+Installation sous Windows<br/>
+Paramétrer eForth Windows<br/>
+Un vrai Forth 64 bits avec eForth Windows<br/>
+Les valeurs sur la pile de données<br/>
+Les valeurs en mémoire<br/>
+Traitement par mots selon taille ou type des données<br/>
+Conclusion<br/>
+Edition et gestion des fichiers sources pour eForth Windows<br/>
+Les éditeurs de fichiers texte<br/>
+Utiliser un IDE<br/>
+Stockage sur GitHub<br/>
+Quelques bonnes pratiques<br/>
+Le fichier mainfs<br/>
+Exemple d’organisation d’un projet<br/>
+Commentaires et mise au point<br/>
+Ecrire un code FORTH lisible<br/>
+Indentation du code source<br/>
+Les commentaires<br/>
+Les commentaires de pile<br/>
+Signification des paramètres de pile en commentaires<br/>
+Commentaires des mots de définition de mots<br/>
+Les commentaires textuels<br/>
+Commentaire en début de code source<br/>
+Outils de diagnostic et mise au point<br/>
+Le décompilateur<br/>
+Dump mémoire<br/>
+Moniteur de pile<br/>
+Dictionnaire / Pile / Variables / Constantes<br/>
+Étendre le dictionnaire<br/>
+Gestion du dictionnaire<br/>
+Piles et notation polonaise inversée<br/>
+Manipulation de la pile de paramètres<br/>
+La pile de retour et ses utilisations<br/>
+Utilisation de la mémoire<br/>
+Variables<br/>
+Constantes<br/>
+Valeurs pseudo-constantes<br/>
+Outils de base pour l'allocation de mémoire<br/>
+Les variables locales avec eForth Windows<br/>
+Introduction<br/>
+Le faux commentaire de pile<br/>
+Action sur les variables locales<br/>
+Structures de données pour eForth Windows<br/>
+Préambule<br/>
+Les tableaux en FORTH<br/>
+Tableau de données à une dimension<br/>
+Mots de définition de tableaux<br/>
+Lire et écrire dans un tableau<br/>
+Exemple pratique de gestion d'écran<br/>
+Gestion de structures complexes<br/>
+Règles de nommage des structures et accesseurs<br/>
+Choix de la taille des champs dans une structure<br/>
+Définition de sprites<br/>
+Les nombres réels avec eForth Windows<br/>
+Les réels avec eForth Windows<br/>
+Precision des nombres réels avec eForth Windows<br/>
+Constantes et variables réelles<br/>
+Opérateurs arithmétiques sur les réels<br/>
+Opérateurs mathématiques sur les réels<br/>
+Opérateurs logiques sur les réels<br/>
+Transformations entiers ↔ réels<br/>
+Affichage des nombres et chaînes de caractères<br/>
+Changement de base numérique<br/>
+Définition de nouveaux formats d'affichage<br/>
+Affichage des caractères et chaînes de caractères<br/>
+Variables chaînes de caractères<br/>
+Code des mots de gestion de variables texte<br/>
+Ajout de caractère à une variable alphanumérique<br/>
+Comparaisons et branchements<br/>
+Branchements conditionnels vers l'avant<br/>
+Branchement conditionnel vers l'arrière<br/>
+Branchement en avant depuis une boucle indéfinie<br/>
+Répétition contrôlée d'une action<br/>
+Structure uni-conditionnelle à choix multiples<br/>
+La récursivité<br/>
+Les tests logiques<br/>
+Les vocabulaires avec eForth Windows<br/>
+Liste des vocabulaires<br/>
+Les vocabulaires essentiels<br/>
+Liste du contenu d'un vocabulaire<br/>
+Utilisation des mots d'un vocabulaire<br/>
+Chainage des vocabulaires<br/>
+Les mots à action différée<br/>
+Définition et utilisation de mots avec defer<br/>
+Définition d'une référence avant<br/>
+Un cas pratique<br/>
+Les mots de création de mots<br/>
+Utilisation de does><br/>
+Exemple de gestion de couleur<br/>
+Affichage de boites modales<br/>
+MessageBoxA<br/>
+Contenu et comportement de la boîte de dialogue<br/>
+Valeur retournée<br/>
+Explications supplémentaires<br/>
+Définition du bouton par défaut<br/>
+Rajout d'une icône dans la boite modale<br/>
+Etendre le vocabulaire graphics pour Windows<br/>
+Définition des mots dans graphics internals<br/>
+Trouver les fonctions disponibles dans un fichier dll<br/>
+Dependency Walker<br/>
+Premiers tracés graphiques<br/>
+Ouvrir une fenêtre<br/>
+Tracé de lignes<br/>
+Coloration des tracés graphiques<br/>
+Tracé de formes géométriques<br/>
+Colorier l'intérieur des formes<br/>
+Tracé de rectangles<br/>
+Tracé de polygones<br/>
+Tracé d'ellipses<br/>
+Tracé d'arcs<br/>
+Afficher du texte dans l'environnement graphique<br/>
+DrawTextA<br/>
+Définition de la zone de tracé du texte<br/>
+Formatage du texte<br/>
+Changer la couleur du texte<br/>
+TextOutA<br/>
+Les fontes de caractères<br/>
+Fonte et police<br/>
+CreateFontA<br/>
+Contenu détaillé des vocabulaires eForth Windows<br/>
+Version v 70721<br/>
+FORTH<br/>
+windows<br/>
+Liste des fonctions graphiques de la librairie Gdi32<br/>
+Bitmaps<br/>
+Clip<br/>
+Coordonnées et transformation<br/>
+Couleurs<br/>
+Pinceaux<br/>
+Stylos<br/>
+Lignes et courbes<br/>
+Formes remplies<br/>
+Fontes et textes<br/>
+Contexte appareil<br/>
+Régions<br/>
+Ressources<br/>
+En anglais<br/>
+En français<br/>
+GitHub<br/>
+Facebook <br/>
 
