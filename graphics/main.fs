@@ -38,20 +38,15 @@ DEFINED? .( invert [IF]
   ; immediate
 [THEN]
 
-\ load windows extensions
-include dumpTool.fs
-
-\ load windows extensions
-include User32-definitions.fs
-
-\ load graphics extensions
-include Gdi32-definitions.fs
 
 \ load graphics tests
 include config.fs
 
 \ load graphics tests
 \ include tests/graphicsTests.fs
+
+\ load 01_hello.fs test
+include tests/01_hello.fs
 
 \ load 02_textOut.fs test
 \ include tests/02_textOut.fs
@@ -100,17 +95,4 @@ include config.fs
 
 \ load 17_messageTests.fs
 \ include tests/17_messageTests.fs
-
-
-
-
-\ 100_hwndHdcTests.fs
-\ include tests/100_hwndHdcTests.fs
-
-\ 101_rectanglesTests.fs
-include tests/101_rectanglesTests.fs
-
-\ 102_menusTests.fs
-\ include tests/102_menusTests.fs
-
 
