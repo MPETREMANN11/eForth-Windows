@@ -2,7 +2,7 @@
 \ Serial Port
 \    Filename:      serial.fs
 \    Date:          06 dec 2024
-\    Updated:       07 dec 2024
+\    Updated:       09 dec 2024
 \    File Version:  1.0
 \    MCU:           eForth Windows
 \    Copyright:     Marc PETREMANN
@@ -16,6 +16,11 @@
 
 only also 
 windows also structures
+
+\ Initializes the communication parameters of a specified communication device
+\ @TODO à tester
+z" SetupComm"  3 Kernel32 SetupComm  ( hFile dwInQueue dwOutQueue -- fl )
+
 
 $10000000 constant GENERIC_ALL      \ All possible access rights
 $20000000 constant GENERIC_EXECUTE  \ Execute access
@@ -32,7 +37,7 @@ OPEN_EXISTING value CF_dwCreationDisposition
 0       value CF_dwFlagsAndAttributes
 NULL    value CF_hTemplateFile
 
-: .error  ( n -- )
+: .error  ( -- )
     getLastError
     dup ." Error: " . space
     case
@@ -62,45 +67,41 @@ NULL    value CF_hTemplateFile
 
 
 \ Sets the control parameter for a serial communication device
-struct DCB 
-  i32 field ->DCBlength
-  i32 field ->BaudRate
-  i32 field ->fBinary
-  i32 field ->fParity
-  i32 field ->fOutxCtsFlow
-  i32 field ->fOutxDsrFlow
-  i32 field ->fDtrControl
-  i32 field ->fDsrSensitivity
-  i32 field ->fTXContinueOnXoff
-  i32 field ->fOutX
-  i32 field ->fInX
-  i32 field ->fErrorChar
-  i32 field ->fNull
-  i32 field ->fRtsControl
-  i32 field ->fAbortOnError
-  i32 field ->fDummy2
-  i16  field ->wReserved
-  i16  field ->XonLim
-  i16  field ->XoffLim
-  i8  field ->ByteSize
-  i8  field ->Parity
-  i8  field ->StopBits
-  i8  field ->XonChar
-  i8  field ->XoffChar
-  i8  field ->ErrorChar
-  i8  field ->EofChar
-  i8  field ->EvtChar
-  i16  field ->wReserved1
+\ struct DCB \ transfered in Kernel32-definitions.fs
 
-\ Retrieves the current control settings for a specified communications device
-z" GetCommState" 2 Kernel32 GetCommState  ( hSerial lpDCB -- fl )
-
+\ DCB structure for COM port
 create dcbSerialParams
     DCB allot
 
 \ store serial parameters in DCB structure
-: get-serial-params ( -- )
-    hSerial dcbSerialParams GetCommState 0 = if
+: get-serial-params ( hSerial -- )
+     dcbSerialParams GetCommState 0 = if
+        abort" Error: GetCommState"
+    then
+  ;
+
+2 constant EVENPARITY
+3 constant MARKPARITY
+0 constant NOPARITY
+1 constant ODDPARITY
+3 constant SPACEPARITY
+
+0 constant ONESTOPBIT       \ 1 stop bit
+1 constant ONE5STOPBITS     \ 1.5 stop bits
+2 constant TWOSTOPBITS      \ 2 stop bits
+
+\ set speedn byte size, parity and stop bit
+: set-speed-8N1 ( dcbStruct -- )
+    >r
+    115200      r@ !field ->BaudRate
+    8           r@ !field ->ByteSize
+    NOPARITY    r@ !field ->Parity
+    ONESTOPBIT  r> !field ->StopBits
+  ;
+
+\ set serial port with DCB structure
+: set-serial-params ( hSerial -- )
+    dcbSerialParams SetCommState 0 = if
         abort" Error: GetCommState"
     then
   ;
@@ -108,7 +109,9 @@ create dcbSerialParams
 \ initialise serial port
 : init-serial
     create-serial to hSerial
-    get-serial-params
+    hSerial get-serial-params
+    dcbSerialParams set-speed-8N1
+    hSerial set-serial-params
   ;
 
 \ close serial port
@@ -117,4 +120,5 @@ create dcbSerialParams
         abort" Error: CloseHandle"
     then
   ;
+
 
