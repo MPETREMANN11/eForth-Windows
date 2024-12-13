@@ -13,7 +13,9 @@
 
 
 only forth 
+windows also
 windows definitions
+structures
 
 \ get handle for current window
 z" GetForegroundWindow"  0 User32 GetForegroundWindow   ( -- hwnd )
