@@ -86,6 +86,12 @@ z" GetCommState" 2 Kernel32 GetCommState  ( hSerial lpDCB -- fl )
 \ configures a communications device according to the specifications in a DCB
 z" SetCommState" 2 Kernel32 SetCommState  ( hSerial lpDCB -- fl )
 
+\ Transmits a specified character before any pending data in the output buffer
+z" TransmitCommChar" 2 Kernel32 TransmitCommChar  ( hFile cChar -- fl )
+
+\ Initializes the communication parameters of a specified communication device
+z" SetupComm"  3 Kernel32 SetupComm  ( hFile dwInQueue dwOutQueue -- fl )
+
 
 only forth definitions
 
