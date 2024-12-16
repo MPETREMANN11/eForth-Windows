@@ -2,7 +2,7 @@
 \ Serial Port
 \    Filename:      serial.fs
 \    Date:          06 dec 2024
-\    Updated:       09 dec 2024
+\    Updated:       16 dec 2024
 \    File Version:  1.0
 \    MCU:           eForth Windows
 \    Copyright:     Marc PETREMANN
@@ -16,10 +16,6 @@
 
 only also 
 windows also structures
-
-\ Initializes the communication parameters of a specified communication device
-\ @TODO à tester
-z" SetupComm"  3 Kernel32 SetupComm  ( hFile dwInQueue dwOutQueue -- fl )
 
 
 $10000000 constant GENERIC_ALL      \ All possible access rights
@@ -65,6 +61,17 @@ NULL    value CF_hTemplateFile
     then
   ;
 
+\ initialise in and out buffer sizes
+128 value dwInQueue
+128 value dwOutQueue
+
+\ set in and out buffer sizes of serial port
+: setup-comm ( hFile -- fl )
+    dwInQueue dwOutQueue SetupComm  0 = if
+        abort" Error: SetupComm "
+    then
+  ;
+
 
 \ Sets the control parameter for a serial communication device
 \ struct DCB \ transfered in Kernel32-definitions.fs
@@ -76,7 +83,7 @@ create dcbSerialParams
 \ store serial parameters in DCB structure
 : get-serial-params ( hSerial -- )
      dcbSerialParams GetCommState 0 = if
-        abort" Error: GetCommState"
+        abort" Error: GetCommState "
     then
   ;
 
@@ -112,6 +119,7 @@ create dcbSerialParams
     hSerial get-serial-params
     dcbSerialParams set-speed-8N1
     hSerial set-serial-params
+    hSerial setup-comm
   ;
 
 \ close serial port
@@ -121,4 +129,59 @@ create dcbSerialParams
     then
   ;
 
+\ get numbers of transmitted bytes
+variable BytesWritten 
+
+\ send string to serial port
+: to-serial { addr len -- }
+    hSerial addr len BytesWritten NULL WriteFile 0= if
+        ." Error : WiteFile " .error
+    then
+  ;
+
+\ send one char to serial port
+: char-to-serial  ( char -- )
+    hSerial swap TransmitCommChar  0= if
+        ." Error : TransmitCommChar " .error
+    then
+  ;
+
+\ send CR to serial port
+: CR-to-serial ( -- )
+    $0D char-to-serial
+  ;
+
+\ send CRLF to serial port
+: CRLF-to-serial ( -- )
+    $0D char-to-serial
+    $0A char-to-serial
+  ;
+
+\ defered word to send Cr or CRLF to serial port
+defer serialCR
+    ' CR-to-serial is serialCR
+
+\ send string to serial port, terminated by CRLF
+: str-to-serial ( addr len -- )
+    to-serial
+  ;
+
+\ get numbers of received bytes
+variable BytesRead
+
+create BUFFER
+    dwInQueue allot
+    
+\ get transmission from serial port
+: from-serial ( -- )
+    BUFFER dwInQueue erase
+    hSerial BUFFER dwInQueue BytesRead NULL ReadFile 0= if
+        ." Error : ReadFile " .error
+    then
+  ;
+
+\ display buffer content
+: .buffer ( -- )
+    buffer BytesRead @ type
+  ;
 
