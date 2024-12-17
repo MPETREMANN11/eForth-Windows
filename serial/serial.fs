@@ -14,14 +14,40 @@
 
 .( serial.fs loaded)
 
+\ define FALSE and TRUE C compatible flags
+0 constant FALSE
+1 constant TRUE
+
 only also 
 windows also structures
 
+\ show error
+: .error  ( -- )
+    getLastError
+    dup ." Error: " . space
+    case
+        2 of ." port indisponible "    endof
+        5 of ." acces refuse "         endof
+        6 of ." invalid handle "       endof
+    endcase
+  ;
 
+\ configures a communications device according to the specifications in a DCB
+\ @TODO à tester
+z" SetCommTimeouts" 2 Kernel32 SetCommTimeouts  ( hSerial timeouts -- fl )
+
+
+\ *** SET PARAMS for CreateFileA ***********************************************
+
+\ parameters for CF_dwDesiredAccess
 $10000000 constant GENERIC_ALL      \ All possible access rights
 $20000000 constant GENERIC_EXECUTE  \ Execute access
 $40000000 constant GENERIC_WRITE    \ Write access
 $80000000 constant GENERIC_READ     \ Read access
+
+\ parameters for CF_dwShareMode
+\ $00000001 constant FILE_SHARE_READ
+\ $00000002 constant FILE_SHARE_WRITE
 
 
 \ parameters used by CreateFileA
@@ -32,15 +58,6 @@ NULL    value CF_lpSecurityAttributes
 OPEN_EXISTING value CF_dwCreationDisposition
 0       value CF_dwFlagsAndAttributes
 NULL    value CF_hTemplateFile
-
-: .error  ( -- )
-    getLastError
-    dup ." Error: " . space
-    case
-        2 of ." port indisponible "    endof
-        5 of ." acces refuse "         endof
-    endcase
-  ;
 
 -1 constant INVALID_HANDLE_VALUE
 
@@ -68,10 +85,31 @@ NULL    value CF_hTemplateFile
 \ set in and out buffer sizes of serial port
 : setup-comm ( hFile -- fl )
     dwInQueue dwOutQueue SetupComm  0 = if
-        abort" Error: SetupComm "
+        abort" Error: SetupComm " .error
     then
   ;
 
+
+\ *** CONTROL TIME OUT *********************************************************
+
+create timeouts
+    COMMTIMEOUTS allot
+
+\ set read timeouts
+: set-timeouts  { readInterv readTotInterv -- }
+    timeouts COMMTIMEOUTS erase
+    readInterv      timeouts !field ->ReadIntervalTimeout
+    readTotInterv   timeouts !field ->ReadTotalTimeoutConstant
+    hSerial timeouts SetCommTimeouts  0 = if
+        abort" Error: SetCommTimeouts " .error
+    then
+  ;
+    
+\ Usage:
+\  50 500 set-timeouts
+
+
+\ *** SET SERIAL PARAMETERS ****************************************************
 
 \ Sets the control parameter for a serial communication device
 \ struct DCB \ transfered in Kernel32-definitions.fs
@@ -83,7 +121,7 @@ create dcbSerialParams
 \ store serial parameters in DCB structure
 : get-serial-params ( hSerial -- )
      dcbSerialParams GetCommState 0 = if
-        abort" Error: GetCommState "
+        abort" Error: GetCommState " .error
     then
   ;
 
@@ -100,6 +138,9 @@ create dcbSerialParams
 \ set speedn byte size, parity and stop bit
 : set-speed-8N1 ( dcbStruct -- )
     >r
+    DCB         r@ !field ->DCBlength
+    TRUE        r@ !field ->fBinary
+\     TRUE        r@ !field ->fParity 
     115200      r@ !field ->BaudRate
     8           r@ !field ->ByteSize
     NOPARITY    r@ !field ->Parity
@@ -112,6 +153,9 @@ create dcbSerialParams
         abort" Error: GetCommState"
     then
   ;
+
+
+\ *** INIT and CLOSE SERIAL PORT ***********************************************
 
 \ initialise serial port
 : init-serial
@@ -129,6 +173,9 @@ create dcbSerialParams
     then
   ;
 
+
+\ *** WRITE and READ ***********************************************************
+
 \ get numbers of transmitted bytes
 variable BytesWritten 
 
@@ -140,8 +187,8 @@ variable BytesWritten
   ;
 
 \ send one char to serial port
-: char-to-serial  ( char -- )
-    hSerial swap TransmitCommChar  0= if
+: char-to-serial  { char -- } 
+    hSerial char TransmitCommChar  0= if
         ." Error : TransmitCommChar " .error
     then
   ;
@@ -164,24 +211,26 @@ defer serialCR
 \ send string to serial port, terminated by CRLF
 : str-to-serial ( addr len -- )
     to-serial
+    serialCR
   ;
 
 \ get numbers of received bytes
 variable BytesRead
 
-create BUFFER
+\ RECeive BUFFER used by ReafFile
+create REC_BUFFER
     dwInQueue allot
     
 \ get transmission from serial port
 : from-serial ( -- )
-    BUFFER dwInQueue erase
-    hSerial BUFFER dwInQueue BytesRead NULL ReadFile 0= if
+    REC_BUFFER dwInQueue erase
+    hSerial REC_BUFFER dwInQueue BytesRead NULL ReadFile 0= if
         ." Error : ReadFile " .error
     then
   ;
 
 \ display buffer content
 : .buffer ( -- )
-    buffer BytesRead @ type
+    REC_BUFFER BytesRead @ type
   ;
 
