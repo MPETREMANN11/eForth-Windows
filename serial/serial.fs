@@ -2,7 +2,7 @@
 \ Serial Port
 \    Filename:      serial.fs
 \    Date:          06 dec 2024
-\    Updated:       16 dec 2024
+\    Updated:       18 dec 2024
 \    File Version:  1.0
 \    MCU:           eForth Windows
 \    Copyright:     Marc PETREMANN
@@ -32,9 +32,20 @@ windows also structures
     endcase
   ;
 
-\ configures a communications device according to the specifications in a DCB
-\ @TODO à tester
-z" SetCommTimeouts" 2 Kernel32 SetCommTimeouts  ( hSerial timeouts -- fl )
+
+\ *** Global parameters ********************************************************
+
+\ initialise in and out buffer sizes
+256 constant dwInQueue
+256 constant dwOutQueue
+
+\ RECeiVe BUFFER used by ReadFile
+create RECV_BUFFER
+    dwInQueue allot
+    
+\ SEND BUFFER used by WriteFile
+create SEND_BUFFER
+    dwOutQueue allot
 
 
 \ *** SET PARAMS for CreateFileA ***********************************************
@@ -77,10 +88,6 @@ NULL    value CF_hTemplateFile
         .error
     then
   ;
-
-\ initialise in and out buffer sizes
-128 value dwInQueue
-128 value dwOutQueue
 
 \ set in and out buffer sizes of serial port
 : setup-comm ( hFile -- fl )
@@ -174,6 +181,37 @@ create dcbSerialParams
   ;
 
 
+\ *** ADD zSTRING to SEND BUFFER ***********************************************
+
+\ add string to SEND BUFFER
+: +buff!  ( zstr -- )
+    SEND_BUFFER swap lstrcatA drop
+  ;
+
+\ store new string in SEND BUFFER
+: buff!  ( zstr -- )
+    SEND_BUFFER dwOutQueue erase        \ reset content of SEND BUFFER
+    +buff!
+  ;
+
+\ compile a zstring 
+: +buff"  ( -- <s-string> )
+    postpone z"
+    postpone +buff!
+  ; immediate
+
+\ CRLF in z-string format
+create zCRLF
+    $0D c,
+    $0A c,
+    $00 c,
+
+\ CR in z-string format
+create zCR
+    $0D c,
+    $00 c,
+
+
 \ *** WRITE and READ ***********************************************************
 
 \ get numbers of transmitted bytes
@@ -181,9 +219,18 @@ variable BytesWritten
 
 \ send string to serial port
 : to-serial { addr len -- }
-    hSerial addr len BytesWritten NULL WriteFile 0= if
-        ." Error : WiteFile " .error
+    len if  \ test if str is not empty
+        hSerial addr len BytesWritten NULL WriteFile 0= if
+            ." Error : WiteFile " .error
+        then
+    else 
+        abort" nothing to send in SEND_BUFFER"
     then
+  ;
+
+\ send content of SEND_BUFFER to serial port
+: buffer-to-serial ( -- )
+    SEND_BUFFER z>s to-serial
   ;
 
 \ send one char to serial port
@@ -217,20 +264,16 @@ defer serialCR
 \ get numbers of received bytes
 variable BytesRead
 
-\ RECeive BUFFER used by ReafFile
-create REC_BUFFER
-    dwInQueue allot
-    
 \ get transmission from serial port
 : from-serial ( -- )
-    REC_BUFFER dwInQueue erase
-    hSerial REC_BUFFER dwInQueue BytesRead NULL ReadFile 0= if
+    RECV_BUFFER dwInQueue erase
+    hSerial RECV_BUFFER dwInQueue BytesRead NULL ReadFile 0= if
         ." Error : ReadFile " .error
     then
   ;
 
 \ display buffer content
 : .buffer ( -- )
-    REC_BUFFER BytesRead @ type
+    RECV_BUFFER BytesRead @ type
   ;
 
