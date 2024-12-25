@@ -2,7 +2,7 @@
 \ Serial Port
 \    Filename:      serial.fs
 \    Date:          06 dec 2024
-\    Updated:       18 dec 2024
+\    Updated:       25 dec 2024
 \    File Version:  1.0
 \    MCU:           eForth Windows
 \    Copyright:     Marc PETREMANN
@@ -184,33 +184,45 @@ create dcbSerialParams
 \ *** ADD zSTRING to SEND BUFFER ***********************************************
 
 \ add string to SEND BUFFER
-: +buff!  ( zstr -- )
+: buff+!  ( zstr -- )
     SEND_BUFFER swap lstrcatA drop
   ;
 
 \ store new string in SEND BUFFER
 : buff!  ( zstr -- )
     SEND_BUFFER dwOutQueue erase        \ reset content of SEND BUFFER
-    +buff!
+    buff+!
   ;
 
 \ compile a zstring 
-: +buff"  ( -- <s-string> )
+: buff+"  ( -- <s-string> )
     postpone z"
-    postpone +buff!
+    postpone buff+!
   ; immediate
 
-\ CRLF in z-string format
-create zCRLF
-    $0D c,
-    $0A c,
-    $00 c,
+\ add n in decimal form to SEND BUFFER
+: #buff+!  ( n -- )
+    base @ >r decimal <# #s #> s>z
+    buff+!
+    r> base !
+  ;
 
-\ CR in z-string format
-create zCR
-    $0D c,
-    $00 c,
+\ add character C to SEND BUFFER
+: cbuff+!  ( c -- )
+    >r rp@ 1 s>z  buff+!  rdrop
+;
 
+\ add CR code to SEND BUFFER
+: CRbuff+! ( -- )
+    $0D cbuff+!
+  ;
+
+\ add CRLF code to SEND BUFFER
+: CRLFbuff+!
+    CRbuff+!
+    $0A cbuff+!
+  ;
+ 
 
 \ *** WRITE and READ ***********************************************************
 

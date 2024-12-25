@@ -59,35 +59,33 @@ z" AT+VER?"         ATseq: ATver
 \ z" +RCV="           ATseq: +rcv
 
 
-\ test AT string to LoRa transmitter
-\ AT zCRLF +buff!
-\ 
-\ init-COM7
-\ SEND_BUFFER z>s to-serial 
-\ from-serial
-\ .buffer
-
-\ *** defining LoRa Help words *****************************
+\ *** defining LoRa get paramaters and help ************************************
 
 : transmit-receive-display  ( -- )
-    zCRLF +buff!
+    CRLFbuff+!
     buffer-to-serial
     200 ms
     from-serial .buffer
   ;
 
-: ATaddress?
-    ATaddress +buff" ?"  transmit-receive-display ;
-
-: ATband?
-    ATband +buff" ?"  transmit-receive-display ;
-
-: ATcrfop?
-    ATcrfop +buff" ?"  transmit-receive-display ;
-
-: ATcpin?
-    ATcpin +buff" ?"  transmit-receive-display ;
-
+: get-LoRa-params  ( -- )
+    cr ." Lora params : "
+    cr ."  T test transmission"
+    cr ."  A address    B band        C crfof"
+    cr ."  I ipr        P parameter"
+    cr ." press key "  
+    key $5F and  \ conver ASCII code to upper case
+    case
+        [char] T of AT transmit-receive-display exit    endof
+        [char] A of ATaddress                           endof
+        [char] B of ATband                              endof
+        [char] C of ATcrfop                             endof
+        [char] I of ATipr                               endof
+        [char] P of ATparameter                         endof
+    endcase
+    cr  [char] ? cbuff+! 
+    transmit-receive-display
+  ;
 
 
 
