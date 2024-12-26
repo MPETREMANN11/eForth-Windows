@@ -2,7 +2,7 @@
 \ Read Write to LoRa Transmitter
 \    Filename:      RWtoLoRa.fs
 \    Date:          15 dec 2024
-\    Updated:       18 dec 2024
+\    Updated:       26 dec 2024
 \    File Version:  1.0
 \    MCU:           eForth Windows
 \    Copyright:     Marc PETREMANN
@@ -25,7 +25,6 @@
 
 : init-COM7  ( -- )
     z" COM7" to CF_lpFileName
-    ['] CRLF-to-serial is serialCR
     create-serial to hSerial
     hSerial get-serial-params
     dcbSerialParams set-speed-8N1
@@ -61,6 +60,8 @@ z" AT+VER?"         ATseq: ATver
 
 \ *** defining LoRa get paramaters and help ************************************
 
+\ transmit SEND_BUFFER to LoRa and read result to RECV_BUFFER
+\ and display result
 : transmit-receive-display  ( -- )
     CRLFbuff+!
     buffer-to-serial
@@ -68,6 +69,33 @@ z" AT+VER?"         ATseq: ATver
     from-serial .buffer
   ;
 
+\ decode error message in RECV_BUFFER
+: LoRa-errors ( -- )
+    RECV_BUFFER z>s
+    2dup s" +ERR=15" startswith? if 
+        cr ." Unknow error" 2drop exit                  then
+    2dup s" +ERR=13" startswith? if 
+        cr ." TX data more than 240bytes" 2drop exit    then
+    2dup s" +ERR=12" startswith? if 
+        cr ." CRC error" 2drop exit                     then
+    2dup s" +ERR=11" startswith? if 
+        cr ." RX is over times" 2drop exit              then
+    2dup s" +ERR=10" startswith? if 
+        cr ." TX is over times" 2drop exit              then
+    2dup s" +ERR=4" startswith? if 
+        cr ." Unknow command" 2drop exit                then
+    2dup s" +ERR=3" startswith? if 
+        cr ." There is not = symbol in the AT command" 
+        2drop exit                                      then
+    2dup s" +ERR=2" startswith? if 
+        cr ." The head of AT command is not AT string" 
+        2drop exit                                      then
+    2dup s" +ERR=1" startswith? if 
+        cr ."  Not CR-LF in the end of the AT Command." 
+        2drop exit                                      then
+  ;
+
+\ get help for selected LoRa commands
 : get-LoRa-params  ( -- )
     cr ." Lora params : "
     cr ."  T test transmission"
@@ -85,7 +113,13 @@ z" AT+VER?"         ATseq: ATver
     endcase
     cr  [char] ? cbuff+! 
     transmit-receive-display
+    LoRa-errors
   ;
+
+
+
+
+
 
 
 
