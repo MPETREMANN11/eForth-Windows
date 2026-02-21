@@ -2,7 +2,7 @@
 \ FILES 
 \    Filename:      main.fs
 \    Date:          07 jan 2026
-\    Updated:       07 jan 2026
+\    Updated:       12 jan 2026
 \    File Version:  1.0
 \    Forth:         eFORTH Windows
 \    Author:        Marc PETREMANN
@@ -15,88 +15,81 @@
 128 value HEADER_SIZE
   0 value PICTURE_WIDTH
   0 value PICTURE_HEIGHT
+  0 value BITS_PER_PIXEL
+  0 value PICTURE_SIZE
 
-create fileHead
+create FILE_HEAD
     HEADER_SIZE allot
 
 \ get datas from header and store this in values
 : get-header-values ( -- )
-    fileHead >r
+    FILE_HEAD >r
     r@ get-file-size      to FILE_SIZE
     r@ get-bmp-offset     to BMP_OFFSET
     r@ get-header-size    to HEADER_SIZE
     r@ get-picture-width  to PICTURE_WIDTH
     r@ get-picture-height to PICTURE_HEIGHT
+    r@ get-bits-per-pixel to BITS_PER_PIXEL
+    r@ get-picture-size   to PICTURE_SIZE
     r> drop
   ;
 
 : dispHeadDatas  ( -- )
-    fileHead HEADER_SIZE dump
+    FILE_HEAD HEADER_SIZE dump
     cr ." FILE_SIZE     : " FILE_SIZE . 
     cr ." BMP_OFFSET    : " BMP_OFFSET . 
     cr ." HEADER_SIZE   : " HEADER_SIZE .
     cr ." PICT._WIDTH   : " PICTURE_WIDTH .
     cr ." PICT._HEIGHT  : " PICTURE_HEIGHT .
+    cr ." BITS / PIXEL  : " BITS_PER_PIXEL .
+    cr ." PICT._SIZE    : " PICTURE_SIZE .
     cr
   ;
 
 
 variable fileID     \ stores the file handle
 
-: read-file-header ( addr len -- )
-    r/o open-file throw fileID !        \ open file in read only mode
-    \ Read HEADER_SIZE bytes and store its in fileHead
-    fileHead HEADER_SIZE fileID @ read-file throw
-    drop \ drop real bytes reads
-    fileID @ close-file throw           \ close file
-    get-header-values
+: open-bmp-file ( addr len -- )
+    r/o bin open-file throw fileID !        \ open file in read only mode
   ;
 
+: close-bmp-file ( -- )
+    fileID @ close-file throw           \ close file
+    0 fileID !
+  ;
 
+\ point to an array for picture datas storage
+0 value BMP_RAW_DATAS
+    
+\ allot n bytes for BMP datas storage
+: bmp-raw-allot
+\     BMP_RAW_DATAS throw                 \ stop if BMP array previously alloted
+    here to BMP_RAW_DATAS
+    PICTURE_SIZE allot
+  ;
 
+\ read BMP header
+: read-file-header ( -- )
+    0 fileID @ reposition-file
+    FILE_HEAD HEADER_SIZE fileID @ read-file throw drop
+  ;
 
-\ decimal
-\ 
-\ create bmp-raw 
-\     DATAS_TO_READ allot \ Stockage temporaire du BMP (16 octets * 32 lignes)
-\ create oled-data 
-\     DATAS_TO_READ allot \ Stockage final (128 colonnes * 3 pages)
-\ 
-\ 0 variable fd   \ store file descriptor
+\ read BMP datas from file
+: read-file-bmp-datas ( -- )
+    BMP_OFFSET fileID @ reposition-file
+    BMP_RAW_DATAS PICTURE_SIZE fileID @ read-file throw drop
+  ;
 
-\ : load-bmp ( s-addr len -- )
-\     r/o open-file throw fd !
-\     62 fd @ reposition-file \ Sauter l'entête
-\     \ Lire les 23 lignes (BMP est Bottom-Up, on stocke tel quel d'abord)
-\     bmp-raw DATAS_TO_READ fd @ read-file throw drop
-\     fd @ close-file throw 
-\   ;
+\ load BMP header and BMP datas
+: load-bmp ( addr len -- )
+    open-bmp-file
+    read-file-header
+    get-header-values
+    bmp-raw-allot
+    read-file-bmp-datas
+    close-bmp-file
+  ;
 
-\ : get-pixel ( x y -- bit )
-\     \ BMP est Bottom-Up : y=0 est en bas. 
-\     \ Pour le SSD1306, on veut y=0 en haut.
-\     22 swap - ( x y_inv )
-\     16 * over 8 / + bmp-raw + c@ ( x bit-block )
-\     swap 7 and 7 swap - rshift 1 and ;
-
-\ : get-pixel { x y -- bit }
-\     \ 1. Inversion de l'axe Y (BMP est Bottom-Up)
-\     \ On part du principe que l'image fait 23 pixels de haut (0 à 22)
-\     22 y - { inv-y }
-\     
-\     \ 2. Calcul de l'adresse de l'octet dans bmp-raw
-\     \ Chaque ligne fait 16 octets (128 pixels / 8)
-\     inv-y 16 * x 8 / + { offset }
-\     
-\     \ 3. Extraction de l'octet
-\     bmp-raw offset + c@ { octet }
-\     
-\     \ 4. Extraction du bit spécifique dans l'octet
-\     \ En BMP, le bit de poids fort (MSB) est le pixel le plus à gauche
-\     7 x 7 and - { bit-pos }
-\     
-\     octet bit-pos rshift 1 and
-\   ;
 
 \ : convert-to-oled ( -- )
 \     oled-data 384 0 fill
