@@ -3,7 +3,7 @@
 \ Definitions for inference engine
 \    Filename:      main.fs
 \    Date:          08 oct 2026
-\    Updated:       11 oct 2026
+\    Updated:       12 oct 2026
 \    File Version:  1.0
 \    MCU:           eForth Windows
 \    Copyright:     Marc PETREMANN
@@ -32,7 +32,8 @@ vocabulary rules    \ new rules defined in this vocabulary
   ;
 
 : in-forth ( -- )
-    only forth
+    only 
+    forth definitions
   ;
 
 
@@ -59,46 +60,57 @@ struct __RULES
 forth
 
 \ Executes the condition
-: exec-condition [ addr -- ]
-    addr ->condition @ execute
+: exec-condition ( addr -- fl )
+    ->condition @ execute
   ;
 
 \ execute the action
-: exec-action [ fl addr -- ]
-    fl if
-        addr ->action @ execute
-    then
+: exec-action ( addr -- )
+    ->action @ execute
   ;
 
 \ Mark rule as triggered
 \ Indicate that a rule triggered in this cycle
-: set-flag [ fl addr -- ]
+: set-flag { addr -- }
     TRUE addr ->execFlag !
     TRUE to MODIFIED_RULE
   ;
 
 \ create a new rule
-: RULE: 
-    in-rules
+: (RULE:) 
     create
-        swap , ,    ( store xt condition and xt action )
-        0 ,         ( store initial flag, value FALSE )
-        in-forth
-    does>
+        swap , ,    \ store xt condition and xt action
+        0 ,         \ store initial flag, value FALSE
+    does>  
+        { addr }
         \ Execute rule if has not yet been triggered in the cycle
-        dup ->execFlag @ 0= if
-            dup dup
-            exec-condition
-            exec-action
-            set-flag
-        else
-            drop
+        addr ->execFlag @ 0= if
+            addr ->condition @ execute if
+                addr ->action @ execute
+                addr set-flag
+            then
         then
   ;
 
-\ RULES example
+\ define new rule in rules vocabulary
+: RULE: ( -- )
+    in-rules
+    (RULE:) 
+    in-forth 
+  ;
+    
+: :CONDITION ( -- fl )
+    :NONAME
+  ;
 
-:NONAME ." ceci est une condition" TRUE ;
-:NONAME ." ceci est une action" ;
+: :ACTION ( -- )
+    :NONAME
+  ;
+
+\ RULES example
+hex
+:CONDITION  ." ceci est une condition"  TRUE ;
+:ACTION     ." ceci est une action"   ;
 RULE: test1
+rules test1
 
