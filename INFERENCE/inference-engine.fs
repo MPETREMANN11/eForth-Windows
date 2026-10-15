@@ -11,13 +11,6 @@
 \    GNU General Public License
 \ *********************************************************************
 
-\ *** Tools extending vocabulary **************************************
-
-\ FALSE and TRUE are not defined in eForth Windows
- 0 constant FALSE
--1 constant TRUE
-
-
 \ *** Definitions of vocabularies *************************************
 
 vocabulary facts    \ new facts defined in this vocabulary
@@ -53,7 +46,7 @@ forth
     in-forth
   ;
 
-\ display zstring and value in fact, use only in iterpreter mode
+\ display zstring and value in fact
 \ example: ' <fact> explain-fact
 : explain-fact { xtAddr -- }
     xtAddr >name type

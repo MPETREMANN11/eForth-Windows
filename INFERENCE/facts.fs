@@ -11,7 +11,9 @@
 \ *********************************************************************
 
 \ facts defined in facts vocabulary
-FALSE FACT: fait-pluie
-FALSE FACT: fait-froid
-FALSE FACT: fait-gel
+z" Pleut-il" FALSE   FACT: fait-pluie
+
+z" Gèle-t-il" FALSE  FACT: fait-gel
+
+z" Température extérieur" -4   FACT: ext-temp
 

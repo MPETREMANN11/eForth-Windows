@@ -10,30 +10,3 @@
 \    GNU General Public License
 \ *********************************************************************
 
- 0 value DEUTSCH
- 0 value ENGLISH
- 0 value FRANCAIS
-
-: reset-languages ( -- )
-    0 to DEUTSCH
-    0 to ENGLISH
-    0 to FRANCAIS
-  ;
-
-: in-english ( -- )
-    reset-languages
-    -1 to ENGLISH
-  ;
-
-: en-francais ( -- )
-    reset-languages
-    -1 to FRANCAIS
-  ;
-
-: auf-deutsch ( -- )
-    reset-languages
-    -1 to DEUTSCH
-  ;
-
-
-
