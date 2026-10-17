@@ -1,8 +1,9 @@
 \ *********************************************************************
 \ Example facts & rules for load
-\    Filename:      FactsRulesLoad.fs
+\    Filename:      FactsRulesLoan.fs
+\                     see FactsRulesLoan_doc.txt for documentation (in french)
 \    Date:          15 oct 2026
-\    Updated:       15 oct 2026
+\    Updated:       16 oct 2026
 \    File Version:  1.0
 \    MCU:           eForth Windows
 \    Copyright:     Marc PETREMANN
@@ -11,64 +12,103 @@
 \ *********************************************************************
 
 
-\ Facts definitions
 
-FRANCAIS ?\
-DEUTSCH  ?\
-ENGLISH  ?\
+\ Facteur d'échelle pour la précision (1 000 000 = 1.0)
+1000000 CONSTANT PRECISION
+
+\ Mot pour calculer la puissance (1+r)^N en entiers avec virgule fixe
+: POWER-FIXED { base n -- result }
+    PRECISION 
+    n 0 ?do
+        base * PRECISION /
+    loop
+;
+
+\ Calcul exact de la mensualité (64 bits)
+\ Pile : ( capital annees taux_annuel -- mensualite )
+: MENSUALITE-EXACTE { capital annees taux_annuel -- mensualite }
+    \ 1. Calcul du taux mensuel r en virgule fixe
+    taux_annuel PRECISION * 120000 / { r }
+    
+    \ 2. Calcul de (1 + r)^N
+    PRECISION r + annees 12 * POWER-FIXED { num_pow }
+    
+    \ 3. Numerateur corrigé (une seule division par PRECISION pour garder la bonne échelle)
+    capital r * num_pow * PRECISION / { num }
+    
+    \ 4. Denominateur = num_pow - PRECISION
+    num_pow PRECISION - { den }
+    
+    \ 5. Résultat final = Numerateur / Denominateur
+    num den /
+;
+
+\ Test avec vos valeurs : 210000 € sur 20 ans à 3.5% (350)
+\ 210000 20 350 MENSUALITE-EXACTE .
 
 
+\ *** Facts and Rules definitions *************************************
 
-• F1 : Revenu mensuel = $3 500 €$
-      
-    • F2 : Échéance mensuelle demandée = $1 200 €$
-      
-    • F3 : Apport personnel = $10\%$
-      
-    • F4 : Épargne résiduelle après apport = $15 000 €$
-      
-    • F5 : Ancienneté professionnelle = $5\text{ ans}$ en CDI
-      
-2. Base de règles
-Le moteur d'inférence s'appuie sur la base de connaissances suivante :
+en-francais \ select french language
 
-    • Régle R1 : Si (Revenu $> 3 000 €$) alors Revenu_Élevé = Vrai
-      
-    • Règle R2 : Si (Échéance / Revenu $> 0,33$) alors Taux_Endettement_Élevé = Vrai
-      
-    • Règle R3 : Si (Apport $< 20\%$) alors Apport_Faible = Vrai
-      
-    • Règle R4 : Si (Revenu_Élevé = Vrai) ET (Épargne résiduelle $> 10 000 €$) alors Coussin_Sécurité = Vrai
-      
-    • Règle R5 : Si (Taux_Endettement_Élevé = Vrai) ET (Apport_Faible = Vrai) alors Profil_Risqué_Standard = Vrai
-      
-    • Règle R6 : Si (Profil_Risqué_Standard = Vrai) ET (Coussin_Sécurité = Vrai) alors Risque_Atténué = Vrai
-      
-    • Règle R7 : Si (Risque_Atténué = Vrai) ET (Ancienneté $\ge 3\text{ ans}$) alors Prêt_Accordé_Sous_Conditions = Vrai
-      
-3. Deroulé du moteur d'inférence (Cycles d'exécution)
-Cycle 1
-Le moteur évalue les règles applicables aux faits initiaux (F1 à F5) :
 
-    • R1 se déclenche ($\frac{1200}{3500} = 0,34 > 0,33$). ➔ Déduction du fait F6 : Revenu_Élevé
-      
-    • R2 se déclenche ($1200 / 3500 = 0,34 > 0,33$). ➔ Déduction du fait F7 : Taux_Endettement_Élevé
-      
-    • R3 se déclenche ($10\% < 20\%$). ➔ Déduction du fait F8 : Apport_Faible
-      
-Cycle 2
-Le moteur évalue les règles avec les faits enrichis (F1 à F8) :
+FRANCAIS ?\ z" Montant à emprunter"
+DEUTSCH  ?\ z" Darlehensbetrag"
+ENGLISH  ?\ z" Amount to be borrowed"
+210000 FACT: loanAmount
 
-    • R4 se déclenche (F6 est vrai ET $15 000 € > 10 000 €$). ➔ Déduction du fait F9 : Coussin_Sécurité
-      
-    • R5 se déclenche (F7 et F8 sont vrais). ➔ Déduction du fait F10 : Profil_Risqué_Standard
-      
-Cycle 3
-Nouvelles règles évaluées avec la base de faits (F1 à F10) :
+FRANCAIS ?\ z" Durée du pret (années)"
+DEUTSCH  ?\ z" Laufzeit des Darlehens (Jahre)"
+ENGLISH  ?\ z" Loan term (years)"
+20 FACT: loanTerms
 
-    • R6 se déclenche (F10 et F9 sont vrais). ➔ Déduction du fait F11 : Risque_Atténué
-      
-Cycle 4
-Évaluation finale :
+FRANCAIS ?\ z" Taux du prêt (% x 100)"
+DEUTSCH  ?\ z" Darlehenszins (% x 100)"
+ENGLISH  ?\ z" Loan interest rate (% x 100)"
+350 FACT: interestRate
 
-    • R7 se déclenche (F11 est vrai ET $5\text{ ans} \ge 3\text{ ans}$). ➔ Déduction du fait final F12 : Prêt_Accordé_Sous_Conditions
+FRANCAIS ?\ z" Échéance mensuelle demandée"
+DEUTSCH  ?\ z" Gewünschte monatliche Rate"
+ENGLISH  ?\ z" Requested monthly installment"
+FALSE FACT: monthlyInstallment
+
+:CONDITION loanAmount 0 >  loanTerms 0 > and interestRate 0 > and ;
+:ACTION    loanAmount loanTerms interestRate MENSUALITE-EXACTE to monthlyInstallment ;
+RULE: calcMonthlyInstallment
+
+FRANCAIS ?\ z" Revenu mensuel net après impôts"
+DEUTSCH  ?\ z" Monatliches Nettoeinkommen nach Steuern"
+ENGLISH  ?\ z" Net monthly income after taxes"
+2400 FACT: monthIncome
+
+FRANCAIS ?\ z" Revenu élevé"
+DEUTSCH  ?\ z" Hohes Einkommen"
+ENGLISH  ?\ z" High income"
+FALSE FACT: hightIncome
+
+:CONDITION hightIncome 3000 > ;
+:ACTION    TRUE to hightIncome ;
+RULE: calcMonthlyInstallment
+
+FRANCAIS ?\ z" Taux d'endettement élevé"
+DEUTSCH  ?\ z" Hoher Verschuldungsgrad"
+ENGLISH  ?\ z" High debt-to-income ratio"
+FALSE FACT: highDebtToIncome
+
+:CONDITION monthlyInstallment 100 * monthIncome / 33 > ;
+:ACTION    TRUE to highDebtToIncome ;
+RULE: hightDebtTest
+
+
+FRANCAIS ?\ z" Ancienneté professionnelle"
+DEUTSCH  ?\ z" Berufliche Betriebszugehörigkeit"
+ENGLISH  ?\ z" Personal contribution"
+4 FACT: personalContrib
+
+FRANCAIS ?\ z" Apport personnel"
+DEUTSCH  ?\ z" Eigenkapital"
+ENGLISH  ?\ z" Apport personnel"
+FALSE FACT: profSeniority
+
+\     • F4 : Épargne résiduelle après apport = $15 000 €$
+      

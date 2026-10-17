@@ -20,7 +20,7 @@ include vocForthExtensions.fs
 include inference-engine.fs     \ load inference engine
 
 \ include facts.fs
-\ include FactsRulesLoan.fs
+include FactsRulesLoan.fs
 \ include tests.fs
 
 

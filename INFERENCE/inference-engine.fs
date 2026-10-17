@@ -3,7 +3,7 @@
 \ Definitions for inference engine
 \    Filename:      main.fs
 \    Date:          08 oct 2026
-\    Updated:       15 oct 2026
+\    Updated:       17 oct 2026
 \    File Version:  1.0
 \    MCU:           eForth Windows
 \    Copyright:     Marc PETREMANN
@@ -145,11 +145,70 @@ forth
 
 \ define condition of a rule
 : :CONDITION ( -- fl )
+    facts
     :NONAME
   ;
 
 \ define action for a rule
 : :ACTION ( -- )
+    facts
     :NONAME
   ;
 
+
+: explain-rule { xtAddr -- }
+    xtAddr >name type cr
+  ;
+
+\ List all rules
+forth definitions also internals
+: list-rules ( -- )
+    rules context @ @
+    begin dup nonvoc? 
+    while 
+        dup explain-rule
+        >link
+    repeat 
+    drop
+  ;
+only
+
+
+\ Resets the execution flag for all rules
+forth definitions also internals
+: reset-rules ( -- )
+    rules context @ @
+    begin dup nonvoc? 
+    while 
+        FALSE over >body ->execFlag !  \ set ->execFlag à FALSE
+        >link 
+    repeat 
+    drop
+  ;
+only
+
+\ Exécute un cycle d'inférence complet (chaînage avant)
+\ : run-inference ( -- )
+\   reset-rules
+\   BEGIN
+\     FALSE to MODIFIED_RULE
+\     
+\     \ Parcourt toutes les règles du vocabulaire 'rules'
+\     rules context @ @
+\     begin dup nonvoc? 
+\     while 
+\       dup >body execute        \ Exécute le comportement du DOES> de la règle
+\       >link 
+\     repeat 
+\     drop
+\     
+\     MODIFIED_RULE              \ Continue tant qu'une règle a modifié l'état
+\   0= UNTIL ;
+
+
+\ ** Inreference general management ***********************************
+
+: star-inference ( -- )
+    page select-language
+\     run-inference
+  ;
