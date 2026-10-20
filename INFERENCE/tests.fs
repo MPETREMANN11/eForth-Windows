@@ -11,48 +11,75 @@
 \ *********************************************************************
 
 
-\ : explain-rule { xtAddr -- }
-\     xtAddr >name type cr
-\   ;
-\ 
-\ \ List all rules
-\ forth definitions also internals
-\ : list-rules ( -- )
-\     rules context @ @
-\     begin dup nonvoc? 
-\     while 
-\         dup explain-rule
-\         >link
-\     repeat 
-\     drop
-\   ;
-\ only
+\ include FactsRulesLoan.fs
+
+list-facts
+list-rules
 
 
-\ Resets the execution flag for all rules
+: my-word ( -- )
+    [FRANCAIS] ?\ ." mon texte en français"
+    [ENGLISH]  ?\ ." my text in english"
+  ;
+
+\ List all rules
 forth definitions also internals
-: reset-rules ( -- )
+: lr ( -- )
+    .rules-banner
     rules context @ @
-    begin dup nonvoc? 
-    while 
-        FALSE over >body ->execFlag !  \ set ->execFlag à FALSE
-        >link 
-    repeat 
+    begin dup nonvoc?
+    while
+        dup explain-rule
+        >link
+    repeat
     drop
   ;
 only
-
-reset-rules
-
-
 
 forth definitions also internals
-: list-facts ( -- )
-    facts context @ @
-    begin  dup nonvoc? 
-    while  dup explain-fact cr cr >link 
-    repeat 
-    drop
-    forth
+
+\ Parcourt la chaîne récursivement jusqu'au bout, puis affiche au dépilage
+: (lr-rec) ( threads -- )
+    dup nonvoc? if
+        dup >link (lr-rec)   \ Empile la suite et descend
+    else
+        drop                 \ Fin du vocabulaire (fond de pile)
+    endif 
+    explain-rule         \ Exécute l'affichage en remontant
   ;
+
+: lr ( -- )
+    .rules-banner
+    rules context @ @
+    (lr-rec) ;
+
 only
+
+
+
+
+forth
+forget (lr-fac)
+
+\ List all facts
+forth definitions also internals
+\ Explore facts vocabulary recursively and display facts 
+: (lr-fac) ( thread -- )
+    dup nonvoc? if
+        dup >link recurse   \ 1. Descend jusqu'au fond
+        explain-fact
+    else
+        drop                \ 3. Fond de chaîne : nettoie et remonte sans rien exécuter
+    then ;
+
+: list-facts ( -- )
+    .facts-banner
+    facts context @ @ (lr-fac) ;
+only
+
+
+facts context @ @ (lr-fac)
+
+
+
+

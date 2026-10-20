@@ -15,12 +15,12 @@ create --inference
 
 include dumpTool.fs
 include vocForthExtensions.fs
+include config.fs
 
-\ include config.fs               \ load config
 include inference-engine.fs     \ load inference engine
 
-\ include facts.fs
 include FactsRulesLoan.fs
+
 \ include tests.fs
 
 

@@ -2,7 +2,7 @@
 \ Forth vocabulary extension
 \    Filename:      vocForthExtension.fs
 \    Date:          15 oct 2026
-\    Updated:       15 oct 2026
+\    Updated:       20 oct 2026
 \    File Version:  1.0
 \    MCU:           eForth Windows
 \    Copyright:     Marc PETREMANN
@@ -32,6 +32,8 @@
 
 
 \ *** poly language extension *****************************************
+
+\ these values must be used in interpertation mode only
  0 value DEUTSCH
  0 value ENGLISH
  0 value FRANCAIS
@@ -41,6 +43,22 @@
     0 to ENGLISH
     0 to FRANCAIS
   ;
+
+\ these words must be used in compilation mode only
+: [DEUTSCH]
+    DEUTSCH ;  immediate
+
+: [ENGLISH]
+    ENGLISH ;  immediate
+
+: [FRANCAIS]
+    FRANCAIS ;  immediate
+
+\ Example:
+\ : my-word ( -- )
+\     [FRANCAIS] ?\ ." mon texte en français"
+\     [ENGLISH]  ?\ ." my text in english"
+\   ;
 
 : in-english ( -- )
     -1 to ENGLISH
@@ -53,6 +71,13 @@
 : auf-deutsch ( -- )
     -1 to DEUTSCH
   ;
+
+\ Conditionnal compilation
+: ?\ ( fl -- )
+    0= if
+        nl parse drop drop
+    then
+; immediate
 
 \ set language to english, french or german
 : select-language ( -- )
@@ -73,13 +98,6 @@
         [char] F of  en-francais   endof
     endcase
   ;
-
-\ Conditionnal compilation
-: ?\ ( fl -- )
-    0= if
-        nl parse drop drop
-    then
-; immediate
 
 
 

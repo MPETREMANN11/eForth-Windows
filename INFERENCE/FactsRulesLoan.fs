@@ -3,7 +3,7 @@
 \    Filename:      FactsRulesLoan.fs
 \                     see FactsRulesLoan_doc.txt for documentation (in french)
 \    Date:          15 oct 2026
-\    Updated:       16 oct 2026
+\    Updated:       20 oct 2026
 \    File Version:  1.0
 \    MCU:           eForth Windows
 \    Copyright:     Marc PETREMANN
@@ -11,7 +11,7 @@
 \    GNU General Public License
 \ *********************************************************************
 
-
+\ *** calculation of the monthly payment ******************************
 
 \ Facteur d'échelle pour la précision (1 000 000 = 1.0)
 1000000 CONSTANT PRECISION
@@ -26,7 +26,7 @@
 
 \ Calcul exact de la mensualité (64 bits)
 \ Pile : ( capital annees taux_annuel -- mensualite )
-: MENSUALITE-EXACTE { capital annees taux_annuel -- mensualite }
+: EXACT-MONTHLY-PAYMENT { capital annees taux_annuel -- mensualite }
     \ 1. Calcul du taux mensuel r en virgule fixe
     taux_annuel PRECISION * 120000 / { r }
     
@@ -44,12 +44,23 @@
 ;
 
 \ Test avec vos valeurs : 210000 € sur 20 ans à 3.5% (350)
-\ 210000 20 350 MENSUALITE-EXACTE .
+\ 210000 20 350 EXACT-MONTHLY-PAYMENT .
 
 
 \ *** Facts and Rules definitions *************************************
 
-en-francais \ select french language
+FRANCAIS ?\ z" Revenu mensuel net après impôts"
+DEUTSCH  ?\ z" Monatliches Nettoeinkommen nach Steuern"
+ENGLISH  ?\ z" Net monthly income after taxes"
+2400 FACT: monthIncome
+
+\ FRANCAIS ?\ z" Revenu mensuel net"
+\ DEUTSCH  ?\ z" Monatliches Nettoeinkommen"
+\ ENGLISH  ?\ z" Net monthly income"
+\ :CONDITION monthIncome FALSE = ;
+\ :ACTION    loanAmount loanTerms interestRate EXACT-MONTHLY-PAYMENT to monthlyInstallment ;
+\ RULE: testMonthIncome
+
 
 
 FRANCAIS ?\ z" Montant à emprunter"
@@ -72,29 +83,33 @@ DEUTSCH  ?\ z" Gewünschte monatliche Rate"
 ENGLISH  ?\ z" Requested monthly installment"
 FALSE FACT: monthlyInstallment
 
+FRANCAIS ?\ z" Mensualité calculée du crédit"
+DEUTSCH  ?\ z" Berechnete monatliche Kreditrate"
+ENGLISH  ?\ z" Calculated monthly loan payment"
 :CONDITION loanAmount 0 >  loanTerms 0 > and interestRate 0 > and ;
-:ACTION    loanAmount loanTerms interestRate MENSUALITE-EXACTE to monthlyInstallment ;
+:ACTION    loanAmount loanTerms interestRate EXACT-MONTHLY-PAYMENT to monthlyInstallment ;
 RULE: calcMonthlyInstallment
-
-FRANCAIS ?\ z" Revenu mensuel net après impôts"
-DEUTSCH  ?\ z" Monatliches Nettoeinkommen nach Steuern"
-ENGLISH  ?\ z" Net monthly income after taxes"
-2400 FACT: monthIncome
 
 FRANCAIS ?\ z" Revenu élevé"
 DEUTSCH  ?\ z" Hohes Einkommen"
 ENGLISH  ?\ z" High income"
 FALSE FACT: hightIncome
 
+FRANCAIS ?\ z" Evaluation d'un revenu élevé"
+DEUTSCH  ?\ z" Bewertung eines hohen Einkommens"
+ENGLISH  ?\ z" Assessment of a high income"
 :CONDITION hightIncome 3000 > ;
 :ACTION    TRUE to hightIncome ;
-RULE: calcMonthlyInstallment
+RULE: evalHightIncome
 
 FRANCAIS ?\ z" Taux d'endettement élevé"
 DEUTSCH  ?\ z" Hoher Verschuldungsgrad"
 ENGLISH  ?\ z" High debt-to-income ratio"
 FALSE FACT: highDebtToIncome
 
+FRANCAIS ?\ z" Test du taux d'endettement"
+DEUTSCH  ?\ z" Überprüfung des Verschuldungsgrades"
+ENGLISH  ?\ z" Debt-to-income ratio test"
 :CONDITION monthlyInstallment 100 * monthIncome / 33 > ;
 :ACTION    TRUE to highDebtToIncome ;
 RULE: hightDebtTest
