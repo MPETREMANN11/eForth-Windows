@@ -2,6 +2,7 @@
 \ Winmm definitions for musics vocabulary
 \    Filename:      Winmm-definitions.fs
 \    Date:          19 nov 2026
+\    Updaate:       20 nov 2026
 \    File Version:  0.1
 \    MCU:           eForth Windows
 \    Copyright:     Marc PETREMANN
@@ -15,13 +16,48 @@
 \ *** CODE QUI FONCTIONNE ******************************************************
 
 vocabulary musics
-
 only forth
 also windows 
 also structures
 also musics definitions
 
+\ Loads the Windows dynamic-link library Winmm.dll and associates it with the 
+\ Forth word Winmm in order to call its multimedia functions.
 z" Winmm.dll" dll Winmm
+
+
+\ errors constants
+0 constant MMSYSERR_NOERROR
+5 constant MMSYSERR_INVALHANDLE
+6 constant MMSYSERR_NODRIVER
+7 constant MMSYSERR_NOMEM
+8 constant MMSYSERR_NOTSUPPORTED
+
+\ Interrupts the program in the event of an error
+: mm-abort ( fl -- )
+    dup MMSYSERR_NOERROR = if  drop exit  then
+    case
+        MMSYSERR_INVALHANDLE of
+            abort" The specified device handle is not valid"
+        endof
+        MMSYSERR_NODRIVER of
+            abort" No device driver is present"
+        endof
+        MMSYSERR_NOMEM of
+            abort" Unable to allocate or lock memory"
+        endof
+        MMSYSERR_NOTSUPPORTED of
+            abort" The definition is not supported"
+        endof
+    endcase
+  ;
+
+\ Interrupts the program if fl is false
+: mm-success ( fl -- )
+    if  exit  then
+    abort" Undefined erreor"
+  ;
+
 
 \ =====================================================================
 \  PlaySound : simple playback of .wav files
@@ -45,23 +81,23 @@ $00040004 constant SND_RESOURCE
 z" PlaySoundA" 3 Winmm PlaySoundA ( pszSound hmod fdwSound -- fl )
 
 \ play a .wav file, return immediately
-: PlayWav ( zFile -- fl )
-    0 SND_FILENAME SND_ASYNC or PlaySoundA
+: PlayWav ( zFile -- )
+    0 SND_FILENAME SND_ASYNC or PlaySoundA mm-success
   ;
 
 \ play a .wav file, wait until the end
-: PlayWavSync ( zFile -- fl )
-    0 SND_FILENAME PlaySoundA
+: PlayWavSync ( zFile -- )
+    0 SND_FILENAME PlaySoundA mm-success
   ;
 
 \ play a .wav file in loop
-: PlayWavLoop ( zFile -- fl )
-    0 SND_FILENAME SND_ASYNC or SND_LOOP or PlaySoundA
+: PlayWavLoop ( zFile -- )
+    0 SND_FILENAME SND_ASYNC or SND_LOOP or PlaySoundA mm-success
   ;
 
 \ stop any sound played by PlaySound
 : StopSound ( -- )
-    0 0 0 PlaySoundA drop
+    0 0 0 PlaySoundA mm-success
   ;
 
 
@@ -85,8 +121,8 @@ $FFFFFFFF constant WAVE_MAPPER
 
 \ set main volume, left and right channels 0..$FFFF
 : SetVolume ( left right -- )
-    16 lshift or 0 swap waveOutSetVolume drop
-;
+    16 lshift or 0 swap waveOutSetVolume mm-abort
+  ;
 
 \ @TODO: waveOutOpen/Write demandent les structures WAVEFORMATEX et
 \        WAVEHDR, a definir avec le mecanisme 'structures'.
@@ -107,7 +143,7 @@ z" midiOutGetVolume"  2 Winmm midiOutGetVolume  ( hmo lpdwVolume -- err )
 
 $FFFFFFFF constant MIDI_MAPPER
 $00000000 constant CALLBACK_NULL
-0 constant MMSYSERR_NOERROR
+
 
 \ handle of opened MIDI device
 create hMidi  8 allot
@@ -198,13 +234,15 @@ forth definitions
 
 
 PlaySound : PlaySoundA, les constantes SND_* et des mots simples (PlayWav, PlayWavSync, PlayWavLoop, StopSound).
+
 MCI : mciSendStringA, mciGetErrorStringA et un mot mci qui envoie une commande texte (open, play, close).
-MIDI : midiOutOpen, midiOutShortMsg et leurs voisines, plus MidiOpen, NoteOn, NoteOff, Instrument et MidiClose. Un exemple d’usage est en commentaire dans le fichier.
-WaveOut : les imports, y compris waveOutOpen/waveOutWrite, et un mot SetVolume (gauche/droite, de 0 à $FFFF). La lecture d’échantillons PCM reste à faire : elle demande les structures WAVEFORMATEX et WAVEHDR, que je n’ai pas osé définir sans connaître votre syntaxe structures.
+
+MIDI : midiOutOpen, midiOutShortMsg et leurs voisines, plus MidiOpen, NoteOn, NoteOff, Instrument et MidiClose. 
+    Un exemple d’usage est en commentaire dans le fichier.
+
+WaveOut : les imports, y compris waveOutOpen/waveOutWrite, et un mot SetVolume (gauche/droite, de 0 à $FFFF). 
+    La lecture d’échantillons PCM reste à faire : elle demande les structures WAVEFORMATEX et WAVEHDR, que je n’ai 
+    pas osé définir sans connaître votre syntaxe structures.
+
 Timers : timeGetTime, timeBeginPeriod et timeEndPeriod.
-
-Deux points à vérifier :
-
-Déclaration de Winmm : j’ai supposé que cette bibliothèque se déclare comme User32, mais je ne sais pas comment vous le faites. J’ai laissé un @TODO en tête de fichier ; il faudra ajouter la ligne de déclaration, si elle n’existe pas ailleurs.
-Mot ms : l’exemple MIDI suppose que votre eForth fournit ms pour attendre. Sinon, il faudra importer Sleep de Kernel32.
 
