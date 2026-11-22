@@ -26,6 +26,9 @@ needs tools/dumpTool.fs
 \ needs extensions/User32-definitions.fs
 
 \ load Winmm extensions
+needs extensions/Kernel32-definitions.fs
+
+\ load Winmm extensions
 needs extensions/Winmm-definitions.fs
 
 
