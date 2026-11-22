@@ -2,7 +2,7 @@
 \ Kernel extensions 
 \    Filename:      Kernel32-definitions.fs
 \    Date:          01 dec 2024
-\    Updated:       20 nov 2026
+\    Updated:       21 nov 2026
 \    File Version:  1.0
 \    MCU:           eForth Windows
 \    Copyright:     Marc PETREMANN
@@ -31,12 +31,12 @@ z" GetCurrentDirectoryA" 2 Kernel32 GetCurrentDirectoryA ( n buf -- len )
     MAX_PATH cwd-buf GetCurrentDirectoryA  cwd-buf swap 
   ;
 
-z" SetCurrentDirectoryA" 1 Kernel32 SetCurrentDirectoryA ( z -- fl )
-
 \ display current directory
 \ pwd = print working directory
 : pwd  ( -- )
     getcwd type cr ;
+
+z" SetCurrentDirectoryA" 1 Kernel32 SetCurrentDirectoryA ( z -- fl )
 
 \ select other directory, use in compilation
 : (cd) ( zPath -- )

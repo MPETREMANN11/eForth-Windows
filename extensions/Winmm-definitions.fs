@@ -2,7 +2,7 @@
 \ Winmm definitions for musics vocabulary
 \    Filename:      Winmm-definitions.fs
 \    Date:          19 nov 2026
-\    Updaate:       20 nov 2026
+\    Updaate:       22 nov 2026
 \    File Version:  0.1
 \    MCU:           eForth Windows
 \    Copyright:     Marc PETREMANN
@@ -27,16 +27,30 @@ z" Winmm.dll" dll Winmm
 
 
 \ errors constants
-0 constant MMSYSERR_NOERROR
-5 constant MMSYSERR_INVALHANDLE
-6 constant MMSYSERR_NODRIVER
-7 constant MMSYSERR_NOMEM
-8 constant MMSYSERR_NOTSUPPORTED
+ 0 constant MMSYSERR_NOERROR
+ 5 constant MMSYSERR_INVALHANDLE
+ 6 constant MMSYSERR_NODRIVER
+ 7 constant MMSYSERR_NOMEM
+ 8 constant MMSYSERR_NOTSUPPORTED
+
+\ erreors codes for midi interface
+ 2 constant MMSYSERR_BADDEVICEID    \ The specified device identifier is out of range.
+ 4 constant MMSYSERR_ALLOCATED      \ The specified resource is already allocated.
+11 constant MMSYSERR_INVALPARAM     \ The specified pointer or structure is invalid.
+68 constant MIDIERR_NODEVICE        \ No MIDI port was found. This error occurs only when the mapper is opened.
+
+
 
 \ Interrupts the program in the event of an error
 : mm-abort ( fl -- )
     dup MMSYSERR_NOERROR = if  drop exit  then
     case
+        MMSYSERR_BADDEVICEID of
+            abort" The specified device identifier is out of range"
+        endof
+        MMSYSERR_ALLOCATED of
+            abort" The specified resource is already allocated"
+        endof
         MMSYSERR_INVALHANDLE of
             abort" The specified device handle is not valid"
         endof
@@ -49,6 +63,12 @@ z" Winmm.dll" dll Winmm
         MMSYSERR_NOTSUPPORTED of
             abort" The definition is not supported"
         endof
+        MMSYSERR_INVALPARAM of
+            abort" The specified pointer or structure is invalid"
+        endof
+        MIDIERR_NODEVICE of
+            abort" No MIDI port was found"
+        endof
     endcase
   ;
 
@@ -60,7 +80,7 @@ z" Winmm.dll" dll Winmm
 
 
 \ =====================================================================
-\  PlaySound : simple playback of .wav files
+\  PlaySound : simple playback of .wav files | tests OK
 \ =====================================================================
 
 \ ** PlaySound flags **
@@ -105,16 +125,16 @@ z" PlaySoundA" 3 Winmm PlaySoundA ( pszSound hmod fdwSound -- fl )
 \  WAVE OUT : volume et echantillons PCM
 \ =====================================================================
 
-z" waveOutGetNumDevs"     0 Winmm waveOutGetNumDevs     ( -- n )
-z" waveOutSetVolume"      2 Winmm waveOutSetVolume      ( hwo dwVolume -- err )
-z" waveOutGetVolume"      2 Winmm waveOutGetVolume      ( hwo lpdwVolume -- err )
-z" waveOutOpen"           6 Winmm waveOutOpen
+z" waveOutGetNumDevs"       0 Winmm waveOutGetNumDevs     ( -- n )
+z" waveOutSetVolume"        2 Winmm waveOutSetVolume      ( hwo dwVolume -- err )
+z" waveOutGetVolume"        2 Winmm waveOutGetVolume      ( hwo lpdwVolume -- err )
+z" waveOutOpen"             6 Winmm waveOutOpen
         ( lphwo uDeviceID pwfx dwCallback dwInstance fdwOpen -- err )
-z" waveOutClose"          1 Winmm waveOutClose          ( hwo -- err )
-z" waveOutReset"          1 Winmm waveOutReset          ( hwo -- err )
-z" waveOutPrepareHeader"  3 Winmm waveOutPrepareHeader  ( hwo pwh cbwh -- err )
-z" waveOutUnprepareHeader" 3 Winmm waveOutUnprepareHeader ( hwo pwh cbwh -- err )
-z" waveOutWrite"          3 Winmm waveOutWrite          ( hwo pwh cbwh -- err )
+z" waveOutClose"            1 Winmm waveOutClose          ( hwo -- err )
+z" waveOutReset"            1 Winmm waveOutReset          ( hwo -- err )
+z" waveOutPrepareHeader"    3 Winmm waveOutPrepareHeader  ( hwo pwh cbwh -- err )
+z" waveOutUnprepareHeader"  3 Winmm waveOutUnprepareHeader ( hwo pwh cbwh -- err )
+z" waveOutWrite"            3 Winmm waveOutWrite          ( hwo pwh cbwh -- err )
 
 $FFFFFFFF constant WAVE_MAPPER
 1 constant WAVE_FORMAT_PCM
@@ -124,8 +144,27 @@ $FFFFFFFF constant WAVE_MAPPER
     16 lshift or 0 swap waveOutSetVolume mm-abort
   ;
 
-\ @TODO: waveOutOpen/Write demandent les structures WAVEFORMATEX et
-\        WAVEHDR, a definir avec le mecanisme 'structures'.
+\ waveOutOpen/Write demandent les structures WAVEFORMATEX et WAVEHDR
+
+struct WAVEFORMATEX ( -- n )
+    i16 field ->wFormatTag          \ audio format type (e.g. WAVE_FORMAT_PCM, WAVE_FORMAT_IEEE_FLOAT, WAVE_FORMAT_EXTENSIBLE)
+    i16 field ->nChannels           \ number of audio channels (1 for mono, 2 for stereo)
+    i32 field ->nSamplesPerSec      \ sampling rate in hertz (e.g., 11025, 44100, 48000)
+     i8 field ->nAvgBytesPerSec     \ average data rate in bytes per second (nSamplesPerSec * nBlockAlign for PCM)
+    i16 field ->nBlockAlign         \ size of a sample block in bytes (nChannels * wBitsPerSample / 8 for PCM)
+    i16 field ->wBitsPerSample      \ number of bits per sample, depending on wFormatTag (e.g., 8 or 16 for standard PCM)
+    i16 field ->cbSize              \ size in bytes of any additional information appended to the end of the WAVEFORMATEX 
+                                    \ structure (0 if no extension is required, as is the case for standard PCM)
+
+struct WAVEHDR ( -- n )  \ @TODO: à vérifier
+    i64 field ->lpData              \ pointer to the buffer containing the audio data
+    i32 field ->dwBufferLength      \ size of the buffer, in bytes
+    i32 field ->dwBytesRecorded     \ number of bytes actually recorded (used in audio capture
+    i64 field ->dwUser              \ user-defined data (a pointer or custom value associated with the buffer)
+    i32 field ->dwFlags             \ status or control flags (can be combined using |)
+    i32 field ->dwLoops             \ number of loop repetitions during audio playback (used in conjunction with loop flags)
+    i64 field ->lpNext              \ reserved for system use
+    i64 field ->reserved            \ reserved for system use
 
 
 \ =====================================================================
@@ -149,13 +188,13 @@ $00000000 constant CALLBACK_NULL
 create hMidi  8 allot
 
 \ open default MIDI device
-: MidiOpen ( -- err )
-    hMidi MIDI_MAPPER 0 0 CALLBACK_NULL midiOutOpen
+: MidiOpen ( -- )
+    hMidi MIDI_MAPPER 0 0 CALLBACK_NULL midiOutOpen mm-abort
   ;
 
 \ close MIDI device
-: MidiClose ( -- err )
-    hMidi @ midiOutClose
+: MidiClose ( -- )
+    hMidi @ midiOutClose mm-abort
   ;
 
 \ assemble a short MIDI message
@@ -186,18 +225,13 @@ create hMidi  8 allot
 \     60 127 0 NoteOn  500 ms  60 0 0 NoteOff
 \     MidiClose drop
 
+\ =====================================================================
+\  TIMERS multimedia
+\ =====================================================================
 
-
-forth definitions
-
-<EOF>
-
-
-\ *** CODE A TESTER ************************************************************
-
-
-
-
+z" timeGetTime"     0 Winmm timeGetTime     ( -- ms )
+z" timeBeginPeriod" 1 Winmm timeBeginPeriod ( uPeriod -- err )
+z" timeEndPeriod"   1 Winmm timeEndPeriod   ( uPeriod -- err )
 
 
 \ =====================================================================
@@ -217,23 +251,12 @@ z" mciGetErrorStringA" 3 Winmm mciGetErrorStringA ( err lpBuf len -- fl )
 \     z" close snd" mci drop
 : mci ( zCmd -- err )
     0 0 0 mciSendStringA
-;
+  ;
 
-
-\ =====================================================================
-\  TIMERS multimedia
-\ =====================================================================
-
-z" timeGetTime"    0 Winmm timeGetTime    ( -- ms )
-z" timeBeginPeriod" 1 Winmm timeBeginPeriod ( uPeriod -- err )
-z" timeEndPeriod"  1 Winmm timeEndPeriod  ( uPeriod -- err )
 
 forth definitions
 
 <EOF>
-
-
-PlaySound : PlaySoundA, les constantes SND_* et des mots simples (PlayWav, PlayWavSync, PlayWavLoop, StopSound).
 
 MCI : mciSendStringA, mciGetErrorStringA et un mot mci qui envoie une commande texte (open, play, close).
 
