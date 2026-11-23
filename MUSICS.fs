@@ -2,7 +2,7 @@
 \ Graphics tests
 \    Filename:      MUSICS.fs
 \    Date:          19 nov 2026
-\    Updated:       19 nov 2026
+\    Updated:       23 nov 2026
 \    File Version:  1.0
 \    MCU:           eForth Windows
 \    Copyright:     Marc PETREMANN
@@ -31,5 +31,7 @@ needs extensions/Kernel32-definitions.fs
 \ load Winmm extensions
 needs extensions/Winmm-definitions.fs
 
+\ load Midi extensions
+needs extensions/Midi-definitions.fs
 
 needs MUSICS/main.fs
