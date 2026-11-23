@@ -2,7 +2,7 @@
 \ Winmm definitions for musics vocabulary
 \    Filename:      Winmm-definitions.fs
 \    Date:          19 nov 2026
-\    Updaate:       22 nov 2026
+\    Updaate:       23 nov 2026
 \    File Version:  0.1
 \    MCU:           eForth Windows
 \    Copyright:     Marc PETREMANN
@@ -17,9 +17,9 @@
 
 vocabulary musics
 only forth
-also windows 
-also structures
-also musics definitions
+windows also
+structures also
+musics definitions
 
 \ Loads the Windows dynamic-link library Winmm.dll and associates it with the 
 \ Forth word Winmm in order to call its multimedia functions.
